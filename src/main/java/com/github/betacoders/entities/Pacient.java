@@ -7,7 +7,21 @@ import com.github.betacoders.types.Position;
  */
 public class Pacient {
   private Position pos;
-  private boolean preferential;
   private StaticEntities target;
-  private int ticketNum;
+  private boolean preferential;
+  private int ticketNum = 0; // Starts at 0, representing an invalid state
+
+  public Pacient(Position pos, boolean preferential) {
+    this.pos = pos;
+    this.preferential = preferential;
+    this.target = StaticEntities.TOTEM;
+  }
+
+  public void giveTicketNum(int ticketNum) {
+    this.ticketNum = ticketNum;
+  }
+
+  public boolean getPreferential() {
+    return preferential;
+  }
 }
