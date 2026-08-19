@@ -18,10 +18,27 @@ public class Pacient {
   }
 
   public void giveTicketNum(int ticketNum) {
+    if (this.ticketNum == 0)
+      throw new TicketAlreadyGivenException();
+    if (ticketNum <= 0)
+      throw new InvalidTicketNumberException(ticketNum);
+
     this.ticketNum = ticketNum;
   }
 
   public boolean getPreferential() {
     return preferential;
+  }
+
+  public class TicketAlreadyGivenException extends RuntimeException {
+    TicketAlreadyGivenException() {
+      super("A ticket has already be given to this patient!");
+    }
+  }
+
+  public class InvalidTicketNumberException extends RuntimeException {
+    InvalidTicketNumberException(int num) {
+      super("Can't give a ticket of number %d to a patient.".formatted(num));
+    }
   }
 }
