@@ -1,6 +1,7 @@
 package com.github.betacoders.entities;
 
 import com.github.betacoders.types.Position;
+import com.github.betacoders.types.Vitals;
 
 /**
  * Pacient
@@ -8,6 +9,8 @@ import com.github.betacoders.types.Position;
 public class Pacient {
   private Position pos;
   private StaticEntities target;
+
+  private Vitals vitals;
   private boolean preferential;
   private int ticketNum = 0; // Starts at 0, representing an invalid state
 
