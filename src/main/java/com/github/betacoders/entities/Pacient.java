@@ -26,6 +26,17 @@ public class Pacient {
     this.ticketNum = ticketNum;
   }
 
+  public String getTicketString() {
+    if (ticketNum <= 0)
+      throw new InvalidTicketNumberException(ticketNum);
+
+    StringBuilder out = new StringBuilder(5);
+    out.append(preferential ? 'P' : 'N');
+    out.append("%04d".formatted(ticketNum));
+
+    return out.toString();
+  }
+
   public boolean getPreferential() {
     return preferential;
   }
