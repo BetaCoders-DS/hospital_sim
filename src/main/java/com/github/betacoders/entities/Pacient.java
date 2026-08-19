@@ -18,7 +18,7 @@ public class Pacient {
   }
 
   public void giveTicketNum(int ticketNum) {
-    if (this.ticketNum == 0)
+    if (this.ticketNum != 0)
       throw new TicketAlreadyGivenException();
     if (ticketNum <= 0)
       throw new InvalidTicketNumberException(ticketNum);
