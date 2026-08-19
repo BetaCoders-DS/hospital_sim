@@ -41,6 +41,14 @@ public class Pacient {
     return preferential;
   }
 
+  public StaticEntities getTarget() {
+    return target;
+  }
+
+  public void setTarget(StaticEntities e) {
+    target = e;
+  }
+
   public class TicketAlreadyGivenException extends RuntimeException {
     TicketAlreadyGivenException() {
       super("A ticket has already be given to this patient!");
