@@ -6,8 +6,8 @@ import java.util.Arrays;
  * Vector
  */
 public class Vector<T> {
-  private final int INIT_CAP = 2;
-  private final int CAP_MULT = 2;
+  public final int INIT_CAP = 2;
+  public final int CAP_MULT = 2;
   private int size;
   private int cap = INIT_CAP;
   private Object[] data;
@@ -59,6 +59,14 @@ public class Vector<T> {
 
   private void increase() {
     resize(cap * CAP_MULT);
+  }
+
+  public int size() {
+    return size;
+  }
+
+  public int cap() {
+    return cap();
   }
 
   public void resize(int cap) {
