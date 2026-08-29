@@ -12,12 +12,12 @@ public class Vector<T> {
   private int cap = INIT_CAP;
   private Object[] data;
 
-  Vector() {
+  public Vector() {
     data = new Object[cap];
     size = 0;
   }
 
-  Vector(int cap) {
+  public Vector(int cap) {
     data = new Object[cap];
     size = 0;
   }
