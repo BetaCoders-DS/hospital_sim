@@ -17,7 +17,7 @@ public record Vitals(int oxigenSat, int bodyTemp, int painLevel, int conscious) 
 
   public class InvalidVitalsException extends RuntimeException {
     InvalidVitalsException() {
-      super("Ivalid vitals state");
+      super("Invalid vitals state");
     }
   }
 }
