@@ -29,7 +29,7 @@ public class Pacient {
     this.ticketNum = ticketNum;
   }
 
-  public String getTicketString() {
+  public String ticketString() {
     if (ticketNum <= 0)
       throw new InvalidTicketNumberException(ticketNum);
 
@@ -40,15 +40,15 @@ public class Pacient {
     return out.toString();
   }
 
-  public boolean getPreferential() {
+  public boolean preferential() {
     return preferential;
   }
 
-  public StaticEntities getTarget() {
+  public StaticEntities target() {
     return target;
   }
 
-  public void setTarget(StaticEntities e) {
+  public void target(StaticEntities e) {
     target = e;
   }
 
