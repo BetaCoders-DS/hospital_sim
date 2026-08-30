@@ -147,6 +147,19 @@ public class LinkedList<T> implements List<T> {
     return n == null ? null : n.item;
   }
 
+  @Override
+  public void insert(int i, T item) {
+    Node newN = new Node(item);
+    Node n = nodeAt(i);
+
+    if (n == null)
+      throw new IndexOutOfBoundsException();
+
+    newN.prev = n.prev;
+    newN.next = n;
+    n.prev = newN;
+  }
+
   public T remove(int i) {
     Node n = nodeAt(i);
     if (n == null)

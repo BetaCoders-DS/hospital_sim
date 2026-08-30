@@ -13,4 +13,8 @@ public interface List<T> extends Iterable<T> {
   void add(T item);
 
   void remove(T item);
+
+  void insert(int i, T item);
+
+  int size();
 }
