@@ -1,5 +1,6 @@
 package com.github.betacoders.types.collections;
 
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -182,6 +183,61 @@ public class LinkedList<T> implements List<T> {
   public void clear() {
     head = tail = null;
     size = 0;
+  }
+
+  /* Merge Sort */
+  public void sort(Comparator<T> cmp) {
+    if (size() < 2)
+      return;
+
+    for (int w = 1; w < size(); w *= 2) {
+      Node start = head;
+      Node dummy = new Node(null);
+      Node nTail = dummy;
+
+      while (start != null) {
+        Node left = start;
+        Node right = split(left, w);
+        start = (right != null) ? split(right, w) : null;
+
+        while (left != null && right != null) {
+          int comp = cmp.compare(left.item, right.item);
+          if (comp > 0) {
+            nTail.next = right;
+            right.prev = nTail;
+            right = right.next;
+          } else {
+            nTail.next = left;
+            left.prev = nTail;
+            left = left.next;
+          }
+          nTail = nTail.next;
+        }
+
+        Node rest = (left == null) ? right : left;
+        if (rest != null) {
+          nTail.next = rest;
+          rest.prev = nTail;
+          while (nTail.next != null)
+            nTail = nTail.next;
+        }
+      }
+
+      head = dummy.next;
+      if (head != null)
+        head.prev = null;
+      tail = nTail;
+    }
+  }
+
+  private Node split(Node n, int count) {
+    while (--count > 0 && n.next != null)
+      n = n.next;
+    Node next = n.next;
+    n.next = null;
+    if (next != null)
+      next.prev = null;
+    return next;
   }
 
   private class ListIterator implements Iterator<T> {
