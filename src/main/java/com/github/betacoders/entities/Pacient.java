@@ -5,8 +5,8 @@ import com.github.betacoders.types.Vitals;
 
 /**
  * Pacient
- * Única entidade móvel, não é armazenada no grid junto das outras, mas em uma
- * lista separada
+ * Única entidade móvel, é armazenada num grid secundario, e também
+ * numa lista encadeada.
  */
 public class Pacient {
   private Position pos;
