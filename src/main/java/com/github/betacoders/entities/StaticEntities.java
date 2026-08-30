@@ -4,20 +4,22 @@ package com.github.betacoders.entities;
  * StaticEntities
  * Entidades que permanecem estáticas ao longo da simulação.
  */
-public enum StaticEntities {
+public sealed interface StaticEntities {
   /**
    * É a célula transitável padrão. Qualquer paciente pode caminhar livremente
    * por ela. O único impedimento é que duas entidades não podem ocupar a mesma
    * célula de chão ao mesmo tempo.
    */
-  FLOOR,
+  public record Floor() implements StaticEntities {
+  }
 
   /**
    * Representa barreiras físicas intransponíveis. O algoritmo de busca de
    * caminhos deve ignorar estas células, e os personagens nunca podem
    * atravessá-las.
    */
-  WALL,
+  public record Wall() implements StaticEntities {
+  }
 
   /**
    * Há exatamente um no mapa. É o ponto de entrada física na simulação. Novos
@@ -25,7 +27,8 @@ public enum StaticEntities {
    * célula esteja livre.
    * 
    */
-  GENERATOR,
+  public record Generator() implements StaticEntities {
+  }
 
   /**
    * Há exatamente um no mapa. É o ponto de saída. Quando um paciente que já
@@ -33,14 +36,16 @@ public enum StaticEntities {
    * lista de agentes ativos e suas estatísticas são computadas pelo sistema.
    * 
    */
-  REMOVER,
+  public record Remover() implements StaticEntities {
+  }
 
   /**
    * Dispositivo eletrônico onde o paciente retira sua senha de atendimento. O
    * paciente deve se deslocar até o totem logo após entrar no hospital. Apenas
    * um paciente pode interagir com cada totem por vez.
    */
-  TOTEM,
+  public record Totem() implements StaticEntities {
+  }
 
   /**
    * Células onde os pacientes aguardam a sua vez de serem chamados (seja para
@@ -50,7 +55,8 @@ public enum StaticEntities {
    * assento antes de iniciar o deslocamento impede que dois pacientes caminhem
    * para a mesma cadeira.
    */
-  SEAT,
+  public record Seat() implements StaticEntities {
+  }
 
   /**
    * Posto fixo de atendimento de enfermagem. O paciente não deve pisar na
@@ -58,12 +64,14 @@ public enum StaticEntities {
    * chão livre adjacente (vizinha) à enfermeira. O atendimento é considerado
    * iniciado quando o paciente chega a essa posição adjacente.
    */
-  NURSE,
+  public record Nurse() implements StaticEntities {
+  }
 
   /**
    * Consultório médico de atendimento. Assim como na triagem, o paciente não
    * sobrepõe a célula do médico; ele se posiciona em uma célula livre
    * adjacente para realizar a consulta.
    */
-  MEDIC;
+  public record Medic() implements StaticEntities {
+  }
 }

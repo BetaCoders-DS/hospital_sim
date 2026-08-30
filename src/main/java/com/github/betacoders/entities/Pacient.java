@@ -19,7 +19,7 @@ public class Pacient {
   public Pacient(Position pos, boolean preferential) {
     this.pos = pos;
     this.preferential = preferential;
-    this.target = StaticEntities.TOTEM;
+    this.target = new StaticEntities.Totem();
   }
 
   public void giveTicketNum(int ticketNum) {
