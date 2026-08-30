@@ -82,7 +82,6 @@ public class FlatBTree<T extends Comparable<T>> implements Tree<T> {
 
   @Override
   public Iterator<T> iterator() {
-    // TODO: implement method
     return null;
   }
 
