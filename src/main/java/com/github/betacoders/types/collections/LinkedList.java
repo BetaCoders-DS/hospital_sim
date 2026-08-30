@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
  * Classe genérica de lista linkada.
  * Deverá ser usada para as filas da simulação
  */
-public class LinkedList<T> implements Iterable<T> {
+public class LinkedList<T> implements List<T> {
   private class Node {
     private T item;
     private Node prev = null;
@@ -95,18 +95,18 @@ public class LinkedList<T> implements Iterable<T> {
     return -1;
   }
 
-  public boolean remove(T item) {
+  public void remove(T item) {
     if (item == null)
-      return false;
+      return;
     Node n = head;
     while (n != null) {
       if (n.item == item) {
         remove(n);
-        return true;
+        return;
       }
       n = n.next;
     }
-    return false;
+    return;
   }
 
   private void remove(Node n) {
@@ -154,6 +154,16 @@ public class LinkedList<T> implements Iterable<T> {
     T item = n.item;
     remove(n);
     return item;
+  }
+
+  @Override
+  public void set(int i, T val) {
+    nodeAt(i).item = val;
+  }
+
+  @Override
+  public void add(T item) {
+    this.addLast(item);
   }
 
   public void clear() {
