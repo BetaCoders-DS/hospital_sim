@@ -4,6 +4,8 @@ import java.util.Iterator;
 
 /**
  * FlatBTree
+ * Classe genérica para armazenamento de objetos em uma árvore binária linkada.
+ * Provavelmente não será usada
  */
 public class FlatBTree<T extends Comparable<T>> implements Tree<T> {
   protected Vector<T> nodes;

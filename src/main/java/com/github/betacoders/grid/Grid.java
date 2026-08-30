@@ -1,5 +1,9 @@
 package com.github.betacoders.grid;
 
+/*
+ * Grid
+ * Classe genérica de armazenamento de enumerações em grid.
+ */
 public class Grid<E extends Enum<E>> {
   public interface CellConsumer {
     void apply(int x, int y);

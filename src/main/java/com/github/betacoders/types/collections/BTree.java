@@ -2,6 +2,11 @@ package com.github.betacoders.types.collections;
 
 import java.util.Iterator;
 
+/*
+ * BTree
+ * Classe genérica para armazenamento de objetos em uma árvore binária linkada.
+ * Provavelmente não será usada
+ */
 public class BTree<T extends Comparable<T>> implements Tree<T> {
   protected Node root = null;
 

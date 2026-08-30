@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 /**
  * Vector
+ * Implementação genérica de um vetor dinâmico
  */
 public class Vector<T> {
   public final int INIT_CAP = 2;

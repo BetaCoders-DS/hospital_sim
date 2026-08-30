@@ -2,6 +2,7 @@ package com.github.betacoders.types;
 
 /**
  * Vitals
+ * Armazenamento de informações do paciente pré atendimento
  */
 public record Vitals(int oxigenSat, int bodyTemp, int painLevel, int conscious) {
   public Vitals {

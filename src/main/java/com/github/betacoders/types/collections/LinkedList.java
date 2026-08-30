@@ -2,6 +2,11 @@ package com.github.betacoders.types.collections;
 
 import java.util.Iterator;
 
+/*
+ * LinkedList
+ * Classe genérica de lista linkada.
+ * Deverá ser usada para as filas da simulação
+ */
 public class LinkedList<T> implements Iterable<T> {
 
   public class Node {
