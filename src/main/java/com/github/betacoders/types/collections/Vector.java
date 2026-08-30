@@ -19,6 +19,7 @@ public class Vector<T> {
 
   public Vector(int cap) {
     data = new Object[cap];
+    this.cap = cap;
     size = 0;
   }
 
@@ -28,8 +29,7 @@ public class Vector<T> {
 
   public void set(int i, T item) {
     data[i] = item;
-    if (size <= i)
-      size = i + 1;
+    this.size = Math.max(size, i + 1);
   }
 
   public boolean isEmpty() {
@@ -66,12 +66,13 @@ public class Vector<T> {
   }
 
   public int cap() {
-    return cap();
+    return cap;
   }
 
   public void resize(int cap) {
     data = Arrays.copyOf(data, cap);
     if (size > cap)
       size = cap;
+    this.cap = cap;
   }
 }
