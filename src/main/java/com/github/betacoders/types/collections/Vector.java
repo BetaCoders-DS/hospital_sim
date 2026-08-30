@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
  * Vector
  * Implementação genérica de um vetor dinâmico
  */
-public class Vector<T> implements Iterable<T> {
+public class Vector<T> implements List<T> {
   public final int INIT_CAP = 2;
   public final int CAP_MULT = 2;
   private int size;
@@ -116,6 +116,18 @@ public class Vector<T> implements Iterable<T> {
       data[j] = data[j + 1];
     data[--size] = null;
     return out;
+  }
+
+  @Override
+  public void remove(T item) {
+    for (int i = 0; i < size; ++i)
+      if (this.get(i) == item)
+        removeAt(i);
+  }
+
+  @Override
+  public void add(T item) {
+    this.push(item);
   }
 
   public void clear() {
