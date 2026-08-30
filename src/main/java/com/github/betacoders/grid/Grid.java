@@ -2,9 +2,9 @@ package com.github.betacoders.grid;
 
 /*
  * Grid
- * Classe genérica de armazenamento de enumerações em grid.
+ * Classe genérica de armazenamento de objetos em grid.
  */
-public class Grid<E extends Enum<E>> {
+public class Grid<T> {
   public interface CellConsumer {
     void apply(int x, int y);
   }
@@ -29,11 +29,11 @@ public class Grid<E extends Enum<E>> {
     this.cells = new Object[h * w];
   }
 
-  public E get(int x, int y) {
-    return (E) cells[y * sizeX + x];
+  public T get(int x, int y) {
+    return (T) cells[y * sizeX + x];
   }
 
-  public void set(int x, int y, E c) {
+  public void set(int x, int y, T c) {
     cells[y * sizeX + x] = c;
   }
 
