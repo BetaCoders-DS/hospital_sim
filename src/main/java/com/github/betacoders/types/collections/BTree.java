@@ -15,15 +15,16 @@ public class BTree<T extends Comparable<T>> implements Tree<T> {
     }
   }
 
-  public void insert(T val) {
+  public T insert(T val) {
     if (root == null) {
       root = new Node(val);
-      return;
+      return null;
     }
-    add(root, val);
+
+    return add(root, val);
   }
 
-  protected void add(Node node, T val) {
+  protected T add(Node node, T val) {
     while (node != null) {
       int comp = val.compareTo(node.val);
 
@@ -46,8 +47,9 @@ public class BTree<T extends Comparable<T>> implements Tree<T> {
       }
 
       else
-        return;
+        return node.val;
     }
+    return null;
   }
 
   public boolean contains(T val) {
