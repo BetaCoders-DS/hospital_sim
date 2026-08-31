@@ -122,6 +122,10 @@ public sealed interface StaticEntities {
       return state == State.OCIOSO;
     }
 
+    //retorna o estado da enfermeira
+    public State getState() {
+      return state; 
+    }
   }
 
   /**
