@@ -41,5 +41,9 @@ public final class RelogioSimulacao {
     return tempoDecorrido; //retorna o tempo se passou desde que a simulacao comecou
   }
 
+   public boolean isPausado() {
+    return pausado; // retorna se esta pausado ou nao
+  }
+
 
 }
