@@ -1,4 +1,16 @@
 package com.github.betacoders.time;
 
 public final class Estatisticas {
+
+    private int totalAtendidos = 0;  //quantos pacientes ja sairam pelo Removedor
+    private double somaTempoEspera = 0;  //soma dos tempos de espera de todos os atendidos
+    private double somaTempoTotal = 0;  //soma dos tempos totais no sistema de todos os atendidos
+
+
+    //Registra a saida de um paciente, acumulando seus tempos nas estatisticas
+    public void registrarSaida(double tempoEsperaTotal, double tempoNoSistema) {
+        totalAtendidos++;  //incrementa o contador de atendidos
+        somaTempoEspera += tempoEsperaTotal;  //acumula tempo de espera
+        somaTempoTotal += tempoNoSistema;  //acumula tempo total no sistema
+  }
 }
