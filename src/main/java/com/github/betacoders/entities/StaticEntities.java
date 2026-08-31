@@ -112,6 +112,11 @@ public sealed interface StaticEntities {
       state = State.OCUPADO;
     }
 
+    //libera a enfermeira, voltando ao estado ocioso (fim do atendimento ou reset)
+    public void liberar() {
+      state = State.OCIOSO;
+    }
+
   }
 
   /**
