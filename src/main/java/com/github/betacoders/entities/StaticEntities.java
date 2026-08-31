@@ -117,6 +117,11 @@ public sealed interface StaticEntities {
       state = State.OCIOSO;
     }
 
+    //retorna se a enfermeira esta livre para chamar o proximo paciente
+    public boolean estaOciosa() {
+      return state == State.OCIOSO;
+    }
+
   }
 
   /**
