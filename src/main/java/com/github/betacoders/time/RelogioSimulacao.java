@@ -25,16 +25,20 @@ public final class RelogioSimulacao {
   }
 
 
-  // Pausa o relogio (chamado ao entrar no Menu de Pausa)
+  //Pausa o relogio (chamado ao entrar no Menu de Pausa)
   public void pausar() {
     pausado = true; // o relogio pausa
   }
 
-// Reseta o relogio ao estado inicial (chamado ao clicar Resetar)
+  //Reseta o relogio ao estado inicial (chamado ao clicar Resetar)
   public void resetar() {
     tempoDecorrido = 0; //zera o tempo do relogio
     ultimoMillis = System.currentTimeMillis(); //ancora a referencia no tempo real de agora
     pausado = false; //o relogio avanca
+  }
+
+  public double getTempoDecorrido() {
+    return tempoDecorrido; //retorna o tempo se passou desde que a simulacao comecou
   }
 
 
