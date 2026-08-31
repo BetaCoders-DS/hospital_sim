@@ -24,4 +24,10 @@ public final class RelogioSimulacao {
     ultimoMillis = agora;                         // atualiza a referencia
   }
 
+
+  // Pausa o relogio (chamado ao entrar no Menu de Pausa)
+  public void pausar() {
+    pausado = true;
+  }
+
 }
