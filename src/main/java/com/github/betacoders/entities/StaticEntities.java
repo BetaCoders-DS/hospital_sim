@@ -50,7 +50,7 @@ public sealed interface StaticEntities {
   /**
    * Celulas onde os pacientes aguardam a sua vez de serem chamados (seja para
    * a triagem ou para o atendimento medico). Um assento possui estados logicos
-   * claros: livre, reservado (quando um paciente esta caminhando em direcaoo a
+   * claros: livre, reservado (quando um paciente esta caminhando em direcao a
    * ele) e ocupado (quando o paciente esta efetivamente sentado). Reservar o
    * assento antes de iniciar o deslocamento impede que dois pacientes caminhem
    * para a mesma cadeira.
@@ -66,17 +66,17 @@ public sealed interface StaticEntities {
     private state = State.LIVRE;  //assento comeca livre por padrao
 
 
-    //marca o assento como ocupado
+    //metodo para marcar o assento como ocupado
     public void ocupar() {
       state = State.OCUPADO;
     }
 
-    //marca o assento como reservado
+    //metodo para marcar o assento como reservado
     public void reservar() {
       state = State.RESERVADO;
     }
 
-    //marca o assento como liberado
+    //metodo para marcar o assento como liberado
     public void liberar() {
       state = State.LIVRE;
     }
@@ -90,6 +90,7 @@ public sealed interface StaticEntities {
     public State getState() {
     return state;
   }
+
   }
 
   /**
@@ -134,6 +135,7 @@ public sealed interface StaticEntities {
    * adjacente para realizar a consulta.
    */
   public final class Medic implements StaticEntities {
+
     //2 possiveis estados do medico
     public enum State {
       OCIOSO, OCUPADO
@@ -141,21 +143,20 @@ public sealed interface StaticEntities {
 
     private State state = State.OCIOSO; //medico comeca ocioso por padrao
 
-    //marca o medico como upado (quando comeca um atendimento)
+    //marca o medico como ocupado (paciente comeca a ser atendido)
     public void ocupar() {
       state = State.OCUPADO;
     }
 
-    //medico volta ao estado ocioso (fim da consulta ou reset)
+    //libera o medico, voltando ao estado ocioso (fim da consulta ou reset)
     public void liberar() {
       state = State.OCIOSO;
     }
 
-    //retorna se o medico esta livre para charmar o proximo paciente
+    //retorna se o medico esta livre para chamar o proximo paciente
     public boolean estaOcioso() {
       return state == State.OCIOSO;
     }
-
     //retorna o estado do medico
     public State getState() {
       return state;
@@ -163,4 +164,4 @@ public sealed interface StaticEntities {
 
   }
 
-}  
+}
