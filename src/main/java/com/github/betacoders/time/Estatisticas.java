@@ -32,7 +32,14 @@ public final class Estatisticas {
 
     //Retorna o total de atendidos
     public int getTotalAtendidos() {
-    return totalAtendidos;
+        return totalAtendidos;
+    } 
+
+    // Zera todas as metricas (chamado durante o reset geral da simulacao)
+    public void zerar() {
+        totalAtendidos = 0;  //zera o total de atendidos
+        somaTempoEspera = 0;  //zera o tempo total de espera
+        somaTempoTotal = 0;  //zera o tempo total
   }
 
 }
