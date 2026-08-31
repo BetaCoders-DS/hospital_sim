@@ -31,27 +31,27 @@ public sealed interface StaticEntities {
   }
 
   /**
-   * Há exatamente um no mapa. É o ponto de saída. Quando um paciente que já
-   * concluiu todo o seu tratamento médico pisa nesta célula, ele é retirado da
-   * lista de agentes ativos e suas estatísticas são computadas pelo sistema.
+   * Ha exatamente um no mapa. E o ponto de saida. Quando um paciente que ja
+   * concluiu todo o seu tratamento medico pisa nesta celula, ele e retirado da
+   * lista de agentes ativos e suas estatisticas sao computadas pelo sistema.
    * 
    */
   public final class Remover implements StaticEntities {
   }
 
   /**
-   * Dispositivo eletrônico onde o paciente retira sua senha de atendimento. O
-   * paciente deve se deslocar até o totem logo após entrar no hospital. Apenas
+   * Dispositivo eletronico onde o paciente retira sua senha de atendimento. O
+   * paciente deve se deslocar ate o totem logo apos entrar no hospital. Apenas
    * um paciente pode interagir com cada totem por vez.
    */
   public final class Totem implements StaticEntities {
   }
 
   /**
-   * Células onde os pacientes aguardam a sua vez de serem chamados (seja para
-   * a triagem ou para o atendimento médico). Um assento possui estados lógicos
-   * claros: livre, reservado (quando um paciente está caminhando em direção a
-   * ele) e ocupado (quando o paciente está efetivamente sentado). Reservar o
+   * Celulas onde os pacientes aguardam a sua vez de serem chamados (seja para
+   * a triagem ou para o atendimento medico). Um assento possui estados logicos
+   * claros: livre, reservado (quando um paciente esta caminhando em direcaoo a
+   * ele) e ocupado (quando o paciente esta efetivamente sentado). Reservar o
    * assento antes de iniciar o deslocamento impede que dois pacientes caminhem
    * para a mesma cadeira.
    */
@@ -66,17 +66,17 @@ public sealed interface StaticEntities {
     private state = State.LIVRE;  //assento comeca livre por padrao
 
 
-    //metodo para marcar o assento como ocupado
+    //marca o assento como ocupado
     public void ocupar() {
       state = State.OCUPADO;
     }
 
-    //metodo para marcar o assento como reservado
+    //marca o assento como reservado
     public void reservar() {
       state = State.RESERVADO;
     }
 
-    //metodo para marcar o assento como liberado
+    //marca o assento como liberado
     public void liberar() {
       state = State.LIVRE;
     }
@@ -86,27 +86,67 @@ public sealed interface StaticEntities {
       return state == State.LIVRE; //compara o estado atual com LIVRE
     }
 
-    //getter para retornar o estado do assento
+    //retorna o estado do assento
     public State getState() {
     return state;
   }
-
   }
 
   /**
-   * Posto fixo de atendimento de enfermagem. O paciente não deve pisar na
-   * célula ocupada pela enfermeira. Ele deve se deslocar para uma célula de
-   * chão livre adjacente (vizinha) à enfermeira. O atendimento é considerado
-   * iniciado quando o paciente chega a essa posição adjacente.
+   * Posto fixo de atendimento de enfermagem. O paciente nao deve pisar na
+   * celula ocupada pela enfermeira. Ele deve se deslocar para uma celula de
+   * chao livre adjacente (vizinha) a enfermeira. O atendimento e considerado
+   * iniciado quando o paciente chega a essa posicao adjacente.
    */
   public final class Nurse implements StaticEntities {
+
+    //2 possiveis estados da enfermaria
+    public enum State {
+      OCIOSO, OCUPADO
+    }
+
+    private State state = State.OCIOSO; //enfermeira comeca ociosa por padrao
+
+    //marca a enfermeira como ocupada (paciente comeca a ser atendido)
+    public void ocupar() {
+      state = State.OCUPADO;
+    }
+
   }
 
   /**
-   * Consultório médico de atendimento. Assim como na triagem, o paciente não
-   * sobrepõe a célula do médico; ele se posiciona em uma célula livre
+   * Consultorio medico de atendimento. Assim como na triagem, o paciente nao
+   * sobrepoe a celula do medico; ele se posiciona em uma celula livre
    * adjacente para realizar a consulta.
    */
   public final class Medic implements StaticEntities {
+    //2 possiveis estados do medico
+    public enum State {
+      OCIOSO, OCUPADO
+    }
+
+    private State state = State.OCIOSO; //medico comeca ocioso por padrao
+
+    //marca o medico como upado (quando comeca um atendimento)
+    public void ocupar() {
+      state = State.OCUPADO;
+    }
+
+    //medico volta ao estado ocioso (fim da consulta ou reset)
+    public void liberar() {
+      state = State.OCIOSO;
+    }
+
+    //retorna se o medico esta livre para charmar o proximo paciente
+    public boolean estaOcioso() {
+      return state == State.OCIOSO;
+    }
+
+    //retorna o estado do medico
+    public State getState() {
+      return state;
+    }
+
   }
-}
+
+}  
