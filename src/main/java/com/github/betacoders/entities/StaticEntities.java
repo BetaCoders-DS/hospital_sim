@@ -81,6 +81,10 @@ public sealed interface StaticEntities {
       state = State.LIVRE;
     }
 
+    //consulta se o assento esta livre para ser reservado
+    public boolean estaLivre() {
+      return state == State.LIVRE; //compara o estado atual com LIVRE
+    }
 
 
 
