@@ -1,9 +1,9 @@
 package com.github.betacoders.time;
 
 public final class RelogioSimulacao {
-    private double tempoDecorrido = 0;   // relogio logico da simulacaoo
-    private long ultimoMillis;           // ultimo instante real em que o relogio foi atualizado
-    private boolean pausado = false;     // se true, o relogio para de avancar
+    private double tempoDecorrido = 0;  //relogio logico da simulacaoo
+    private long ultimoMillis;  //ultimo instante real em que o relogio foi atualizado
+    private boolean pausado = false;  //se true, o relogio para de avancar
 
     //Incia o relogio do zero (chamado ao comecar uma nova simulacao)
     public void iniciar() {
@@ -18,9 +18,9 @@ public final class RelogioSimulacao {
     if (pausado) {
       return; // pausado, nao avanca o tempo
     }
-    long agora = System.currentTimeMillis();  // tempo real atual
-    long deltaMillis = agora - ultimoMillis;  // quanto passou desde a ultima chamada
-    tempoDecorrido += deltaMillis / 1000.0;  // soma no relogio logico e converte para segundos
+    long agora = System.currentTimeMillis();  //tempo real atual
+    long deltaMillis = agora - ultimoMillis;  //quanto passou desde a ultima chamada
+    tempoDecorrido += deltaMillis / 1000.0;  //soma no relogio logico e converte para segundos
     ultimoMillis = agora;  // atualiza a referencia
   }
 
@@ -42,7 +42,7 @@ public final class RelogioSimulacao {
   }
 
    public boolean isPausado() {
-    return pausado; // retorna se esta pausado ou nao
+    return pausado; //retorna se esta pausado ou nao
   }
 
 
