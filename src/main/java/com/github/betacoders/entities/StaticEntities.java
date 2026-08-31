@@ -86,8 +86,10 @@ public sealed interface StaticEntities {
       return state == State.LIVRE; //compara o estado atual com LIVRE
     }
 
-
-
+    //getter para retornar o estado do assento
+    public State getState() {
+    return state;
+  }
 
   }
 
