@@ -76,7 +76,10 @@ public sealed interface StaticEntities {
       state = State.RESERVADO;
     }
 
-    
+    //metodo para marcar o assento como liberado
+    public void liberar() {
+      state = State.LIVRE;
+    }
 
 
 
