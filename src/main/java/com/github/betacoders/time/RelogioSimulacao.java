@@ -12,4 +12,16 @@ public final class RelogioSimulacao {
     pausado = false;  //se true, o relogio para de avancar
   }
 
+
+  //Avanca o relogio logico da simulacao no tempo
+  public void atualizar() {
+    if (pausado) {
+      return;                                   // pausado, nao avanca o tempo
+    }
+    long agora = System.currentTimeMillis();     // tempo real atual
+    long deltaMillis = agora - ultimoMillis;      // quanto passou desde a ultima chamada
+    tempoDecorrido += deltaMillis / 1000.0;       // soma no relogio logico e converte para segundos
+    ultimoMillis = agora;                         // atualiza a referencia
+  }
+
 }
