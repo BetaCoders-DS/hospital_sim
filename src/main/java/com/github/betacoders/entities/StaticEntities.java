@@ -71,6 +71,17 @@ public sealed interface StaticEntities {
       state = State.OCUPADO;
     }
 
+    //metodo para marcar o assento como reservado
+    public void reservar() {
+      state = State.RESERVADO;
+    }
+
+    
+
+
+
+
+
   }
 
   /**
