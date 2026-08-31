@@ -14,7 +14,7 @@ public final class Estatisticas {
         somaTempoTotal += tempoNoSistema;  //acumula tempo total no sistema
     }
 
-    // Calcula a media de tempo de espera
+    //Calcula a media de tempo de espera
     public double mediaEspera() {
         if (totalAtendidos == 0) {
             return 0;  //retorna 0 se ninguem foi atendido ainda
@@ -22,12 +22,17 @@ public final class Estatisticas {
         return somaTempoEspera / totalAtendidos; //retorna a media do tempo de espera
     }
 
-    // Calcula a media de tempo total no sistema
+    //Calcula a media de tempo total no sistema
     public double mediaTempoTotal() {
         if (totalAtendidos == 0) { 
             return 0;  //retorna 0 se ninguem foi atendido
         }
         return somaTempoTotal / totalAtendidos;  //retorna a media do tempo total
     }
+
+    //Retorna o total de atendidos
+    public int getTotalAtendidos() {
+    return totalAtendidos;
+  }
 
 }
