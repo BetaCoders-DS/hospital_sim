@@ -56,6 +56,21 @@ public sealed interface StaticEntities {
    * para a mesma cadeira.
    */
   public final class Seat implements StaticEntities {
+
+    //3 estados possiveis do assento
+    public enum State {
+      LIVRE, RESERVADO, OCUPADO
+
+    }
+
+    private state = State.LIVRE;  //assento comeca livre por padrao
+
+
+    //metodo para marcar o assento como ocupado
+    public void ocupar() {
+      state = State.OCUPADO;
+    }
+
   }
 
   /**
