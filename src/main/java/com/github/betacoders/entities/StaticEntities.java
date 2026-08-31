@@ -27,7 +27,7 @@ public sealed interface StaticEntities {
    * célula esteja livre.
    * 
    */
-  public record Generator() implements StaticEntities {
+  public final class Generator implements StaticEntities {
   }
 
   /**
@@ -36,7 +36,7 @@ public sealed interface StaticEntities {
    * lista de agentes ativos e suas estatísticas são computadas pelo sistema.
    * 
    */
-  public record Remover() implements StaticEntities {
+  public final class Remover implements StaticEntities {
   }
 
   /**
@@ -44,7 +44,7 @@ public sealed interface StaticEntities {
    * paciente deve se deslocar até o totem logo após entrar no hospital. Apenas
    * um paciente pode interagir com cada totem por vez.
    */
-  public record Totem() implements StaticEntities {
+  public final class Totem implements StaticEntities {
   }
 
   /**
@@ -55,7 +55,7 @@ public sealed interface StaticEntities {
    * assento antes de iniciar o deslocamento impede que dois pacientes caminhem
    * para a mesma cadeira.
    */
-  public record Seat() implements StaticEntities {
+  public final class Seat implements StaticEntities {
   }
 
   /**
@@ -64,7 +64,7 @@ public sealed interface StaticEntities {
    * chão livre adjacente (vizinha) à enfermeira. O atendimento é considerado
    * iniciado quando o paciente chega a essa posição adjacente.
    */
-  public record Nurse() implements StaticEntities {
+  public final class Nurse implements StaticEntities {
   }
 
   /**
@@ -72,6 +72,6 @@ public sealed interface StaticEntities {
    * sobrepõe a célula do médico; ele se posiciona em uma célula livre
    * adjacente para realizar a consulta.
    */
-  public record Medic() implements StaticEntities {
+  public final class Medic implements StaticEntities {
   }
 }
