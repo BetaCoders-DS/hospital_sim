@@ -1,7 +1,11 @@
-package com.github.betacoders;
+package com.github.betacoders.sketch;
+
+import com.github.betacoders.render.ProcessingRenderer;
 import processing.core.PApplet;
 
 public class Sketch extends PApplet {
+
+    private ProcessingRenderer renderer;
 
     @Override
     public void settings() {
@@ -10,11 +14,11 @@ public class Sketch extends PApplet {
 
     @Override
     public void setup() {
-        background(255);
+        renderer = new ProcessingRenderer(this);
     }
 
     @Override
     public void draw() {
-        background(255);
+        renderer.render();
     }
 }
