@@ -6,7 +6,7 @@ import java.util.Random; //Gerador de numeros aleatorios
 public final class GeradorTempo {
     private static final Random random = new Random(); //instacia para gerar os numeros aleatorios
 
-    private GeradorTempo(); {
+    private GeradorTempo() {
     }
 
     //sorteia o tempo  ate o proximo paciente nascer, usando distribuicao exponencial

@@ -63,7 +63,7 @@ public sealed interface StaticEntities {
 
     }
 
-    private state = State.LIVRE;  //assento comeca livre por padrao
+    private State state = State.LIVRE;  //assento comeca livre por padrao
 
 
     //metodo para marcar o assento como ocupado
