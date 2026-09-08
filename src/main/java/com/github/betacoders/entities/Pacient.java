@@ -91,13 +91,25 @@ public class Pacient
     state = novoEstado;
   }
 
-  public void giveTicketNum(int ticketNum) {
+  public void giveTicketNum(int ticketNum)
+  {
     if (this.ticketNum != 0)
+    {
       throw new TicketAlreadyGivenException();
+    }
+
     if (ticketNum <= 0)
+    {
       throw new InvalidTicketNumberException(ticketNum);
+    }
+
+    if (state != State.NO_TOTEM)
+    {
+      throw new IllegalStateException("O paciente precisa estar no totem para receber a senha.");
+    }
 
     this.ticketNum = ticketNum;
+    mudarEstado(State.FILA_TRIAGEM);
   }
 
   public String ticketString() {
