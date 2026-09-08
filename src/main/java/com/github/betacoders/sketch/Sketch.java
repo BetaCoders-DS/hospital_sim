@@ -27,7 +27,8 @@ public class Sketch extends PApplet {
         MENU,
         MAPS,
         SIMULATION,
-        PAUSE
+        PAUSE,
+        INVALID_MAP
     }
 
     private Screen currentScreen = Screen.MENU;
@@ -70,6 +71,9 @@ public class Sketch extends PApplet {
 
         } else if (currentScreen == Screen.PAUSE) {
             drawPause();
+
+        } else if (currentScreen == Screen.INVALID_MAP) {
+            drawInvalidMap();
         }
     }
 
@@ -355,6 +359,65 @@ public class Sketch extends PApplet {
         );
     }
 
+    private void drawInvalidMap() {
+        drawBackground();
+
+        fill(0, 0, 0, 175);
+        noStroke();
+        rect(0, 0, width, height);
+
+        int panelWidth = 600;
+        int panelHeight = 350;
+        int panelX = (width - panelWidth) / 2;
+        int panelY = (height - panelHeight) / 2;
+
+        fill(10, 15, 20, 210);
+        stroke(220);
+        strokeWeight(2);
+
+        rect(
+                panelX,
+                panelY,
+                panelWidth,
+                panelHeight,
+                18
+        );
+
+        textAlign(CENTER, CENTER);
+
+        fill(255);
+        textFont(titleFont);
+
+        text(
+                "INVALID MAP",
+                width / 2,
+                panelY + 75
+        );
+
+        fill(220);
+        textFont(smallFont);
+
+        text(
+                "The selected map is invalid.",
+                width / 2,
+                panelY + 145
+        );
+
+        text(
+                "Check its dimensions, entities and paths.",
+                width / 2,
+                panelY + 175
+        );
+
+        drawButton(
+                "BACK",
+                width / 2 - buttonWidth / 2,
+                panelY + 235,
+                buttonWidth,
+                buttonHeight
+        );
+    }
+
     private void drawButton(
             String label,
             int x,
@@ -485,6 +548,9 @@ public class Sketch extends PApplet {
 
             map = mapLoader.getMap();
             currentScreen = Screen.SIMULATION;
+
+        } else {
+            currentScreen = Screen.INVALID_MAP;
         }
     }
 
@@ -605,6 +671,23 @@ public class Sketch extends PApplet {
                     buttonHeight)) {
 
                 currentScreen = Screen.MENU;
+            }
+
+        } else if (currentScreen == Screen.INVALID_MAP) {
+
+            int panelHeight = 350;
+            int panelY = (height - panelHeight) / 2;
+
+            int buttonX =
+                    width / 2 - buttonWidth / 2;
+
+            if (isInsideButton(
+                    buttonX,
+                    panelY + 235,
+                    buttonWidth,
+                    buttonHeight)) {
+
+                currentScreen = Screen.MAPS;
             }
         }
     }
