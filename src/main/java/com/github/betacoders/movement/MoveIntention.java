@@ -1,10 +1,7 @@
 package com.github.betacoders.movement;
 
-import com.github.betacoders.grid.Grid;
 import com.github.betacoders.types.Position;
 import com.github.betacoders.entities.Pacient;
 
-
-public record MoveIntention(Pacient Pacient, Position next) {
-    
+public record MoveIntention(Pacient pacient, Position next) {
 }
