@@ -7,67 +7,73 @@ import processing.core.PApplet;
 public class MapLoader {
 
     private final PApplet app;
-    private Grid<StaticEntities> mapa;
-    private int geradores;
-    private int removedores;
+    private Grid<StaticEntities> map;
+    private int generators;
+    private int removers;
 
     public MapLoader(PApplet app) {
         this.app = app;
     }
-    public boolean carregar(String arquivo) {
-        String[] linhas = app.loadStrings(arquivo);
-        if (linhas == null || linhas.length == 0) {
-            return false;
-        }
-        String[] dimensoes = PApplet.splitTokens(linhas[0].trim());
-        if (dimensoes.length != 2) {
+    public boolean load(String file) {
+        String[] lines = app.loadStrings(file);
+        if (lines == null || lines.length == 0) {
             return false;
         }
 
-        int linhasMapa;
-        int colunasMapa;
+        String[] dimensions = PApplet.splitTokens(lines[0].trim());
+
+        if (dimensions.length != 2) {
+            return false;
+        }
+
+        int mapRows;
+        int mapColumns;
 
         try {
-            linhasMapa = Integer.parseInt(dimensoes[0]);
-            colunasMapa = Integer.parseInt(dimensoes[1]);
+            mapRows = Integer.parseInt(dimensions[0]);
+            mapColumns = Integer.parseInt(dimensions[1]);
         } catch (NumberFormatException e) {
             return false;
         }
-        if (linhasMapa <= 0 || colunasMapa <= 0) {
+        if (mapRows <= 0 || mapColumns <= 0) {
             return false;
         }
-        if (linhas.length != linhasMapa + 1) {
+        if (lines.length != mapRows + 1) {
             return false;
         }
-        mapa = new Grid<>(colunasMapa, linhasMapa);
+        map = new Grid<>(mapColumns, mapRows);
 
-        geradores = 0;
-        removedores = 0;
+        generators = 0;
+        removers = 0;
 
-        for (int y = 0; y < linhasMapa; y++) {
-            String linha = linhas[y + 1];
-            if (linha.length() != colunasMapa) {
+        for (int y = 0; y < mapRows; y++) {
+            String line = lines[y + 1];
+
+            if (line.length() != mapColumns) {
                 return false;
             }
-            for (int x = 0; x < colunasMapa; x++) {
-                char tipo = linha.charAt(x);
-                StaticEntities entidade = criarEntidade(tipo);
-                if (entidade == null) {
+            for (int x = 0; x < mapColumns; x++) {
+                char symbol = line.charAt(x);
+                StaticEntities entity = createEntity(symbol);
+
+                if (entity == null) {
                     return false;
                 }
-                mapa.set(x, y, entidade);
-                if (tipo == 'G') {
-                    geradores++;
+                map.set(x, y, entity);
+
+                if (symbol == 'G') {
+                    generators++;
                 }
-                if (tipo == 'R') {
-                    removedores++;
+                if (symbol == 'R') {
+                    removers++;
                 }
             }
         }
         return true;
     }
-    private StaticEntities criarEntidade(char tipo) {
-        switch (tipo) {
+
+    private StaticEntities createEntity(char symbol) {
+        switch (symbol) {
             case '.':
                 return new StaticEntities.Floor();
             case '#':
@@ -88,108 +94,109 @@ public class MapLoader {
                 return null;
         }
     }
-    public boolean mapaValido() {
-        if (mapa == null) {
-            return false;
-        }
-        if (geradores != 1 || removedores != 1) {
-            return false;
-        }
 
-        int[] gerador = encontrar(StaticEntities.Generator.class);
-        int[] removedor = encontrar(StaticEntities.Remover.class);
-
-        if (gerador == null || removedor == null) {
+    public boolean isValid() {
+        if (map == null) {
             return false;
         }
-        return existeCaminho(
-                gerador[0],
-                gerador[1],
-                removedor[0],
-                removedor[1]
+        if (generators != 1 || removers != 1) {
+            return false;
+        }
+        int[] generator = find(StaticEntities.Generator.class);
+        int[] remover = find(StaticEntities.Remover.class);
+
+        if (generator == null || remover == null) {
+            return false;
+        }
+        return hasPath(
+                generator[0],
+                generator[1],
+                remover[0],
+                remover[1]
         );
     }
 
-    private int[] encontrar(Class<?> tipo) {
-        for (int y = 0; y < mapa.sizeY(); y++) {
-            for (int x = 0; x < mapa.sizeX(); x++) {
-                StaticEntities entidade = mapa.get(x, y);
+    private int[] find(Class<?> type) {
+        for (int y = 0; y < map.sizeY(); y++) {
+            for (int x = 0; x < map.sizeX(); x++) {
+                StaticEntities entity = map.get(x, y);
 
-                if (tipo.isInstance(entidade)) {
+                if (type.isInstance(entity)) {
                     return new int[]{x, y};
                 }
             }
         }
         return null;
     }
+    private boolean hasPath(
+            int startX,
+            int startY,
+            int targetX,
+            int targetY) {
 
-    private boolean existeCaminho(
-            int inicioX,
-            int inicioY,
-            int destinoX,
-            int destinoY) {
+        boolean[][] visited =
+                new boolean[map.sizeY()][map.sizeX()];
 
-        boolean[][] visitado =
-                new boolean[mapa.sizeY()][mapa.sizeX()];
-        int capacidade = mapa.sizeX() * mapa.sizeY();
+        int capacity = map.sizeX() * map.sizeY();
+        int[] queueX = new int[capacity];
+        int[] queueY = new int[capacity];
 
-        int[] filaX = new int[capacidade];
-        int[] filaY = new int[capacidade];
+        int front = 0;
+        int back = 0;
 
-        int inicioFila = 0;
-        int fimFila = 0;
-
-        filaX[fimFila] = inicioX;
-        filaY[fimFila] = inicioY;
-        fimFila++;
-
-        visitado[inicioY][inicioX] = true;
+        queueX[back] = startX;
+        queueY[back] = startY;
+        back++;
+        visited[startY][startX] = true;
 
         int[] dx = {-1, 1, 0, 0};
         int[] dy = {0, 0, -1, 1};
 
-        while (inicioFila < fimFila) {
-            int x = filaX[inicioFila];
-            int y = filaY[inicioFila];
-            inicioFila++;
-            if (x == destinoX && y == destinoY) {
+        while (front < back) {
+            int x = queueX[front];
+            int y = queueY[front];
+
+            front++;
+
+            if (x == targetX && y == targetY) {
                 return true;
             }
             for (int i = 0; i < 4; i++) {
-                int novoX = x + dx[i];
-                int novoY = y + dy[i];
+                int nextX = x + dx[i];
+                int nextY = y + dy[i];
 
-                if (!dentroDoMapa(novoX, novoY)) {
+                if (!isInsideMap(nextX, nextY)) {
                     continue;
                 }
-                if (visitado[novoY][novoX]) {
+                if (visited[nextY][nextX]) {
                     continue;
                 }
-                if (mapa.get(novoX, novoY)
+                if (map.get(nextX, nextY)
                         instanceof StaticEntities.Wall) {
                     continue;
                 }
-                visitado[novoY][novoX] = true;
-                filaX[fimFila] = novoX;
-                filaY[fimFila] = novoY;
-                fimFila++;
+                visited[nextY][nextX] = true;
+                queueX[back] = nextX;
+                queueY[back] = nextY;
+
+                back++;
             }
         }
         return false;
     }
-    private boolean dentroDoMapa(int x, int y) {
+    private boolean isInsideMap(int x, int y) {
         return x >= 0
-                && x < mapa.sizeX()
+                && x < map.sizeX()
                 && y >= 0
-                && y < mapa.sizeY();
+                && y < map.sizeY();
     }
-    public Grid<StaticEntities> getMapa() {
-        return mapa;
+    public Grid<StaticEntities> getMap() {
+        return map;
     }
-    public int getGeradores() {
-        return geradores;
+    public int getGenerators() {
+        return generators;
     }
-    public int getRemovedores() {
-        return removedores;
+    public int getRemovers() {
+        return removers;
     }
 }
