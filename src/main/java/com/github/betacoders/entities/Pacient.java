@@ -42,6 +42,14 @@ public class Pacient {
     return out.toString();
   }
 
+  public Position pos() {
+    return pos;
+  }
+
+  public void pos(Position p) {
+    pos = p;
+  }
+
   public boolean preferential() {
     return preferential;
   }

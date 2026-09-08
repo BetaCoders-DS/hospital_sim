@@ -1,5 +1,7 @@
 package com.github.betacoders.entities;
 
+import com.github.betacoders.types.Position;
+
 public final class GridOcupacao {
 
   private final Pacient[][] grid; // matriz: cada celula guarda o paciente que esta ali, ou null se vazia
