@@ -7,6 +7,7 @@ import com.github.betacoders.render.ProcessingRenderer;
 import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PImage;
+
 import java.io.File;
 import java.io.FilenameFilter;
 
@@ -15,7 +16,9 @@ public class Sketch extends PApplet {
     private ProcessingRenderer renderer;
     private MapLoader mapLoader;
     private Grid<StaticEntities> map;
+
     private PImage menuBackground;
+
     private PFont titleFont;
     private PFont buttonFont;
     private PFont smallFont;
@@ -28,8 +31,10 @@ public class Sketch extends PApplet {
     }
 
     private Screen currentScreen = Screen.MENU;
+
     private final int buttonWidth = 300;
     private final int buttonHeight = 60;
+
     private String[] availableMaps;
     private String selectedMap;
 
@@ -48,6 +53,7 @@ public class Sketch extends PApplet {
         titleFont = createFont("SansSerif.bold", 42);
         buttonFont = createFont("SansSerif.bold", 25);
         smallFont = createFont("SansSerif", 18);
+
         loadAvailableMaps();
     }
 
@@ -55,13 +61,61 @@ public class Sketch extends PApplet {
     public void draw() {
         if (currentScreen == Screen.MENU) {
             drawMenu();
+
         } else if (currentScreen == Screen.MAPS) {
             drawMaps();
+
         } else if (currentScreen == Screen.SIMULATION) {
-            renderer.renderMap(map);
+            drawSimulation();
+
         } else if (currentScreen == Screen.PAUSE) {
             drawPause();
         }
+    }
+
+    private void drawSimulation() {
+        renderer.renderMap(map);
+        drawSimulationHud();
+    }
+
+    private void drawSimulationHud() {
+        int hudHeight = 42;
+
+        fill(10, 15, 20, 150);
+        noStroke();
+        rect(0, 0, width, hudHeight);
+
+        stroke(180, 150);
+        strokeWeight(1);
+        line(0, hudHeight, width, hudHeight);
+
+        textAlign(LEFT, CENTER);
+
+        fill(255);
+        textFont(smallFont);
+        text(
+                "HOSPITAL SIMULATION",
+                20,
+                hudHeight / 2
+        );
+
+        fill(210);
+        textFont(smallFont);
+        text(
+                getMapDisplayName(selectedMap),
+                260,
+                hudHeight / 2
+        );
+
+        textAlign(RIGHT, CENTER);
+
+        fill(220);
+        textFont(smallFont);
+        text(
+                "ESC - PAUSE",
+                width - 20,
+                hudHeight / 2
+        );
     }
 
     private void drawMenu() {
@@ -78,7 +132,13 @@ public class Sketch extends PApplet {
         fill(10, 15, 20, 120);
         stroke(240);
         strokeWeight(2);
-        rect(panelX, panelY, panelWidth, panelHeight, 18);
+        rect(
+                panelX,
+                panelY,
+                panelWidth,
+                panelHeight,
+                18
+        );
 
         stroke(170);
         strokeWeight(1);
@@ -87,7 +147,8 @@ public class Sketch extends PApplet {
                 panelY + 10,
                 panelWidth - 20,
                 panelHeight - 20,
-                14);
+                14
+        );
 
         textAlign(CENTER, CENTER);
 
@@ -96,28 +157,32 @@ public class Sketch extends PApplet {
         text(
                 "HOSPITAL SIMULATION",
                 width / 2,
-                panelY + 90);
+                panelY + 90
+        );
 
         drawButton(
                 "NEW GAME",
                 width / 2 - buttonWidth / 2,
                 panelY + 165,
                 buttonWidth,
-                buttonHeight);
+                buttonHeight
+        );
 
         drawButton(
                 "MAPS",
                 width / 2 - buttonWidth / 2,
                 panelY + 245,
                 buttonWidth,
-                buttonHeight);
+                buttonHeight
+        );
 
         drawButton(
                 "EXIT",
                 width / 2 - buttonWidth / 2,
                 panelY + 325,
                 buttonWidth,
-                buttonHeight);
+                buttonHeight
+        );
 
         fill(220);
         textFont(smallFont);
@@ -125,7 +190,8 @@ public class Sketch extends PApplet {
         text(
                 "v1.0",
                 panelX + panelWidth - 20,
-                panelY + panelHeight - 18);
+                panelY + panelHeight - 18
+        );
     }
 
     private void drawMaps() {
@@ -142,7 +208,13 @@ public class Sketch extends PApplet {
         fill(10, 15, 20, 200);
         stroke(240);
         strokeWeight(2);
-        rect(panelX, panelY, panelWidth, panelHeight, 18);
+        rect(
+                panelX,
+                panelY,
+                panelWidth,
+                panelHeight,
+                18
+        );
 
         textAlign(CENTER, CENTER);
 
@@ -151,7 +223,8 @@ public class Sketch extends PApplet {
         text(
                 "SELECT MAP",
                 width / 2,
-                panelY + 70);
+                panelY + 70
+        );
 
         int mapButtonY = panelY + 140;
 
@@ -161,20 +234,26 @@ public class Sketch extends PApplet {
             text(
                     "No maps available",
                     width / 2,
-                    mapButtonY + 30);
+                    mapButtonY + 30
+            );
 
         } else {
             int maxMaps = 4;
-            for (int i = 0; i < availableMaps.length && i < maxMaps; i++) {
 
-                String mapName = getMapDisplayName(availableMaps[i]);
+            for (int i = 0;
+                 i < availableMaps.length && i < maxMaps;
+                 i++) {
+
+                String mapName =
+                        getMapDisplayName(availableMaps[i]);
 
                 drawButton(
                         mapName,
                         width / 2 - buttonWidth / 2,
                         mapButtonY + i * 75,
                         buttonWidth,
-                        buttonHeight);
+                        buttonHeight
+                );
             }
         }
 
@@ -183,18 +262,23 @@ public class Sketch extends PApplet {
                 width / 2 - buttonWidth / 2,
                 panelY + 420,
                 buttonWidth,
-                buttonHeight);
+                buttonHeight
+        );
+
         fill(210);
         textFont(smallFont);
+
         text(
                 availableMaps.length + " map(s) available",
                 width / 2,
-                panelY + 390);
+                panelY + 390
+        );
     }
 
     private void drawPause() {
         renderer.renderMap(map);
-        fill(0, 0, 0, 150);
+
+        fill(0, 0, 0, 75);
         noStroke();
         rect(0, 0, width, height);
 
@@ -203,61 +287,72 @@ public class Sketch extends PApplet {
         int panelX = (width - panelWidth) / 2;
         int panelY = (height - panelHeight) / 2;
 
-        fill(10, 15, 20, 220);
+        fill(10, 15, 20, 190);
         stroke(240);
         strokeWeight(2);
+
         rect(
                 panelX,
                 panelY,
                 panelWidth,
                 panelHeight,
-                18);
+                18
+        );
 
         stroke(170);
         strokeWeight(1);
+
         rect(
                 panelX + 10,
                 panelY + 10,
                 panelWidth - 20,
                 panelHeight - 20,
-                14);
+                14
+        );
 
         textAlign(CENTER, CENTER);
 
         fill(255);
         textFont(titleFont);
+
         text(
                 "PAUSED",
                 width / 2,
-                panelY + 75);
+                panelY + 75
+        );
 
         drawButton(
                 "RESUME",
                 width / 2 - buttonWidth / 2,
                 panelY + 140,
                 buttonWidth,
-                buttonHeight);
+                buttonHeight
+        );
 
         drawButton(
                 "RESTART",
                 width / 2 - buttonWidth / 2,
                 panelY + 220,
                 buttonWidth,
-                buttonHeight);
+                buttonHeight
+        );
 
         drawButton(
                 "MAIN MENU",
                 width / 2 - buttonWidth / 2,
                 panelY + 300,
                 buttonWidth,
-                buttonHeight);
+                buttonHeight
+        );
 
         fill(210);
         textFont(smallFont);
+
         text(
                 "Press ESC to resume",
                 width / 2,
-                panelY + 410);
+                panelY + 410
+        );
     }
 
     private void drawButton(
@@ -267,10 +362,11 @@ public class Sketch extends PApplet {
             int buttonWidth,
             int buttonHeight) {
 
-        boolean hovered = mouseX >= x
-                && mouseX <= x + buttonWidth
-                && mouseY >= y
-                && mouseY <= y + buttonHeight;
+        boolean hovered =
+                mouseX >= x
+                        && mouseX <= x + buttonWidth
+                        && mouseY >= y
+                        && mouseY <= y + buttonHeight;
 
         if (hovered) {
             fill(60, 75, 80, 230);
@@ -281,57 +377,70 @@ public class Sketch extends PApplet {
         }
 
         strokeWeight(2);
+
         rect(
                 x,
                 y,
                 buttonWidth,
                 buttonHeight,
-                8);
+                8
+        );
 
         fill(255);
         textFont(buttonFont);
         textAlign(CENTER, CENTER);
+
         text(
                 label,
                 x + buttonWidth / 2,
-                y + buttonHeight / 2);
+                y + buttonHeight / 2
+        );
     }
 
     private void drawBackground() {
         if (menuBackground != null) {
             imageMode(CORNER);
+
             image(
                     menuBackground,
                     0,
                     0,
                     width,
-                    height);
+                    height
+            );
+
         } else {
             background(20);
         }
     }
 
     private void loadAvailableMaps() {
-        File mapsDirectory = new File("src/main/resources/maps");
+        File mapsDirectory =
+                new File("src/main/resources/maps");
 
         if (!mapsDirectory.exists()
                 || !mapsDirectory.isDirectory()) {
+
             availableMaps = new String[0];
             return;
         }
 
-        FilenameFilter mapFilter = new FilenameFilter() {
-            @Override
-            public boolean accept(
-                    File directory,
-                    String name) {
-                return name
-                        .toLowerCase()
-                        .endsWith(".txt");
-            }
-        };
+        FilenameFilter mapFilter =
+                new FilenameFilter() {
 
-        String[] maps = mapsDirectory.list(mapFilter);
+                    @Override
+                    public boolean accept(
+                            File directory,
+                            String name) {
+
+                        return name
+                                .toLowerCase()
+                                .endsWith(".txt");
+                    }
+                };
+
+        String[] maps =
+                mapsDirectory.list(mapFilter);
 
         if (maps == null) {
             availableMaps = new String[0];
@@ -341,29 +450,39 @@ public class Sketch extends PApplet {
     }
 
     private String getMapDisplayName(String fileName) {
+        if (fileName == null) {
+            return "";
+        }
+
         String name = fileName;
 
         if (name.toLowerCase().endsWith(".txt")) {
             name = name.substring(
                     0,
-                    name.length() - 4);
+                    name.length() - 4
+            );
         }
+
         name = name.replace("_", " ");
         name = name.replace("-", " ");
+
         return name.toUpperCase();
     }
 
     private void startGame() {
         if (selectedMap == null) {
+
             if (availableMaps.length == 0) {
                 return;
             }
+
             selectedMap = availableMaps[0];
         }
 
         if (mapLoader.load(
                 "maps/" + selectedMap)
                 && mapLoader.isValid()) {
+
             map = mapLoader.getMap();
             currentScreen = Screen.SIMULATION;
         }
@@ -375,10 +494,14 @@ public class Sketch extends PApplet {
 
     @Override
     public void mousePressed() {
+
         if (currentScreen == Screen.MENU) {
+
             int panelHeight = 510;
             int panelY = (height - panelHeight) / 2;
-            int buttonX = width / 2 - buttonWidth / 2;
+
+            int buttonX =
+                    width / 2 - buttonWidth / 2;
 
             if (isInsideButton(
                     buttonX,
@@ -396,6 +519,7 @@ public class Sketch extends PApplet {
                     panelY + 245,
                     buttonWidth,
                     buttonHeight)) {
+
                 loadAvailableMaps();
                 currentScreen = Screen.MAPS;
 
@@ -404,6 +528,7 @@ public class Sketch extends PApplet {
                     panelY + 325,
                     buttonWidth,
                     buttonHeight)) {
+
                 exit();
             }
 
@@ -411,19 +536,28 @@ public class Sketch extends PApplet {
 
             int panelHeight = 500;
             int panelY = (height - panelHeight) / 2;
-            int buttonX = width / 2 - buttonWidth / 2;
-            int mapButtonY = panelY + 140;
+
+            int buttonX =
+                    width / 2 - buttonWidth / 2;
+
+            int mapButtonY =
+                    panelY + 140;
+
             int maxMaps = 4;
 
-            for (int i = 0; i < availableMaps.length
-                    && i < maxMaps; i++) {
-                int buttonY = mapButtonY + i * 75;
+            for (int i = 0;
+                 i < availableMaps.length && i < maxMaps;
+                 i++) {
+
+                int buttonY =
+                        mapButtonY + i * 75;
 
                 if (isInsideButton(
                         buttonX,
                         buttonY,
                         buttonWidth,
                         buttonHeight)) {
+
                     selectedMap = availableMaps[i];
                     startGame();
                     return;
@@ -435,13 +569,18 @@ public class Sketch extends PApplet {
                     panelY + 420,
                     buttonWidth,
                     buttonHeight)) {
+
                 currentScreen = Screen.MENU;
             }
 
         } else if (currentScreen == Screen.PAUSE) {
+
             int panelHeight = 500;
-            int panelY = (height - panelHeight) / 2;
-            int buttonX = width / 2 - buttonWidth / 2;
+            int panelY =
+                    (height - panelHeight) / 2;
+
+            int buttonX =
+                    width / 2 - buttonWidth / 2;
 
             if (isInsideButton(
                     buttonX,
@@ -456,6 +595,7 @@ public class Sketch extends PApplet {
                     panelY + 220,
                     buttonWidth,
                     buttonHeight)) {
+
                 restartGame();
 
             } else if (isInsideButton(
@@ -463,6 +603,7 @@ public class Sketch extends PApplet {
                     panelY + 300,
                     buttonWidth,
                     buttonHeight)) {
+
                 currentScreen = Screen.MENU;
             }
         }
@@ -470,7 +611,9 @@ public class Sketch extends PApplet {
 
     @Override
     public void keyPressed() {
+
         if (key == ESC) {
+
             key = 0;
 
             if (currentScreen == Screen.SIMULATION) {
