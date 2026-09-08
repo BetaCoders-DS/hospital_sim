@@ -8,7 +8,23 @@ import com.github.betacoders.types.Vitals;
  * Única entidade móvel, é armazenada num grid secundario, e também
  * numa lista encadeada.
  */
-public class Pacient {
+public class Pacient
+{
+  public enum State
+  {
+    INDO_TOTEM,
+    NO_TOTEM,
+    FILA_TRIAGEM,
+    INDO_TRIAGEM,
+    EM_TRIAGEM,
+    FILA_MEDICO,
+    INDO_MEDICO,
+    EM_CONSULTA,
+    INDO_REMOVEDOR,
+    REMOVIDO
+  }
+
+  private State state = State.INDO_TOTEM;
   private Position pos;
   private StaticEntities target;
 
@@ -20,6 +36,59 @@ public class Pacient {
     this.pos = pos;
     this.preferential = preferential;
     this.target = new StaticEntities.Totem();
+  }
+
+  public State getState()
+  {
+    return state;
+  }
+
+  // O controlador avisa as chegadas, chamadas e conclusoes de atendimento.
+  // Esperar ou caminhar mais um quadro nao exige mudar de estado.
+  public void mudarEstado(State novoEstado)
+  {
+    boolean permitida = false;
+
+    switch (state)
+    {
+      case INDO_TOTEM:
+        permitida = novoEstado == State.NO_TOTEM;
+        break;
+      case NO_TOTEM:
+        permitida = novoEstado == State.FILA_TRIAGEM && ticketNum > 0;
+        break;
+      case FILA_TRIAGEM:
+        permitida = novoEstado == State.INDO_TRIAGEM;
+        break;
+      case INDO_TRIAGEM:
+        permitida = novoEstado == State.EM_TRIAGEM;
+        break;
+      case EM_TRIAGEM:
+        permitida = novoEstado == State.FILA_MEDICO;
+        break;
+      case FILA_MEDICO:
+        permitida = novoEstado == State.INDO_MEDICO;
+        break;
+      case INDO_MEDICO:
+        permitida = novoEstado == State.EM_CONSULTA;
+        break;
+      case EM_CONSULTA:
+        permitida = novoEstado == State.INDO_REMOVEDOR;
+        break;
+      case INDO_REMOVEDOR:
+        permitida = novoEstado == State.REMOVIDO;
+        break;
+      case REMOVIDO:
+        break;
+    }
+
+    if (!permitida)
+    {
+      throw new IllegalStateException(
+          "Transicao de estado invalida: " + state + " -> " + novoEstado);
+    }
+
+    state = novoEstado;
   }
 
   public void giveTicketNum(int ticketNum) {
