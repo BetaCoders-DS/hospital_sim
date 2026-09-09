@@ -1,6 +1,6 @@
 package com.github.betacoders.movement;
 
-import com.github.betacoders.entities.Pacient;
+import com.github.betacoders.entities.Patient;
 import com.github.betacoders.grid.Grid;
 
 /**
@@ -8,5 +8,5 @@ import com.github.betacoders.grid.Grid;
  * Ponte pro problema alvo -> posição, que ainda não foi resolvido.
  */
 public interface DistanceSource {
-  Grid<Integer> distancesFor(Pacient pacient);
+  Grid<Integer> distancesFor(Patient patient);
 }

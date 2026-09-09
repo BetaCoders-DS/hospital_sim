@@ -3,14 +3,14 @@ package com.github.betacoders.entities;
 import com.github.betacoders.types.Position;
 
 public final class GridOcuppancy {
-  private final Pacient[][] grid; // matriz: cada celula guarda o paciente que esta ali, ou null se vazia
+  private final Patient[][] grid; // matriz: cada celula guarda o paciente que esta ali, ou null se vazia
 
   public GridOcuppancy(int width, int height) {
-    grid = new Pacient[height][width]; // cria a matriz do mesmo tamanho do mapa
+    grid = new Patient[height][width]; // cria a matriz do mesmo tamanho do mapa
   }
 
   // Marca a celula como ocupada por um paciente
-  public void occupy(Position pos, Pacient pacient) {
+  public void occupy(Position pos, Patient pacient) {
     grid[pos.y][pos.x] = pacient;
   }
 
@@ -25,19 +25,19 @@ public final class GridOcuppancy {
   }
 
   // Retorna quem esta na celula (ou null se estiver vazia)
-  public Pacient pacientOn(Position pos) {
+  public Patient pacientOn(Position pos) {
     return grid[pos.y][pos.x];
   }
 
   // Move um paciente de uma posicao para outra em uma unica operacao
-  public void move(Position from, Position to, Pacient pacient) {
+  public void move(Position from, Position to, Patient pacient) {
     free(from);
     occupy(to, pacient);
   }
 
   // Limpa todo o grid, voltando todas as células a null (usado no reset geral)
   public void clean() {
-    for (Pacient[] row : grid) {
+    for (Patient[] row : grid) {
       java.util.Arrays.fill(row, null);
     }
   }

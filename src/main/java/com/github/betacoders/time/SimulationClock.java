@@ -29,6 +29,13 @@ public final class SimulationClock {
     paused = true; // o relogio pausa
   }
 
+  // Retoma o relogio apos uma pausa, re-ancorando a referencia de tempo real
+  // para que o intervalo da pausa nao cause saltos no relogio logico.
+  public void resume() {
+    paused = false; // o relogio volta a avancar
+    lastUpdateMillis = System.currentTimeMillis(); // re-ancora no tempo real atual
+  }
+
   // Reseta o relogio ao estado inicial (chamado ao clicar Resetar)
   public void reset() {
     timePassed = 0; // zera o tempo do relogio

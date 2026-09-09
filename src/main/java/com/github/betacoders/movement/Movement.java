@@ -1,7 +1,7 @@
 package com.github.betacoders.movement;
 
 import com.github.betacoders.entities.GridOcuppancy;
-import com.github.betacoders.entities.Pacient;
+import com.github.betacoders.entities.Patient;
 import com.github.betacoders.grid.Grid;
 import com.github.betacoders.types.Position;
 import com.github.betacoders.types.collections.LinkedList;
@@ -52,11 +52,11 @@ public class Movement {
     return null;
   }
 
-  public static LinkedList<MoveIntention> computeIntentions(LinkedList<Pacient> pa, DistanceSource sour,
+  public static LinkedList<MoveIntention> computeIntentions(LinkedList<Patient> pa, DistanceSource sour,
       GridOcuppancy occ) {
     LinkedList<MoveIntention> intentions = new LinkedList<>();
 
-    for (Pacient p : pa) {
+    for (Patient p : pa) {
       Grid<Integer> dist = sour.distancesFor(p);
       Position best = bestNeighbor(p.pos(), dist, occ);
       intentions.addLast(new MoveIntention(p, best));
@@ -86,9 +86,9 @@ public class Movement {
       if (!isFirstClaim(mi, intentions))
         continue;
 
-      Position origem = mi.pacient().pos();
-      occupancy.move(origem, mi.next(), mi.pacient());
-      mi.pacient().pos(mi.next());
+      Position origem = mi.patient().pos();
+      occupancy.move(origem, mi.next(), mi.patient());
+      mi.patient().pos(mi.next());
     }
   }
 }
