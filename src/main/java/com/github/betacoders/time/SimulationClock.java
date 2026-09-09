@@ -1,6 +1,6 @@
 package com.github.betacoders.time;
 
-public final class SimulationClock {
+public class SimulationClock {
   private double timePassed = 0; // relogio logico da simulacaoo
   private long lastUpdateMillis; // ultimo instante real em que o relogio foi atualizado
   private boolean paused = false; // se true, o relogio para de avancar

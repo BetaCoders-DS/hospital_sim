@@ -26,6 +26,9 @@ public class Patient
     REMOVED
   }
 
+  private static int nextId = 0;
+
+  private final int id = ++nextId;
   private State state = State.GOING_TO_TOTEM;
   private Position pos;
   private StaticEntities target;
@@ -61,6 +64,12 @@ public class Patient
   public Color getManchesterColor()
   {
     return manchesterColor;
+  }
+
+  // Identificador unico recebido no nascimento (especificacao do projeto).
+  public int id()
+  {
+    return id;
   }
 
   // O controlador chama quando o paciente chega ao posto da enfermeira.

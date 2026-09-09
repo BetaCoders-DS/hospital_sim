@@ -26,7 +26,7 @@ public final class Simulation {
   private final SimulationConfig cfg;
   private final GridOcuppancy occupancy;
   private final MapDistanceSource distanceSource;
-  private final SimulationClock clock = new SimulationClock();
+  private final SimulationClock clock;
   private final Statistics stats = new Statistics();
   private final Random rng = new Random();
   private final ManchesterTree manchester = new ManchesterTree();
@@ -55,8 +55,13 @@ public final class Simulation {
   private double medicBusyUntil = 0;
 
   public Simulation(Grid<StaticEntities> map, SimulationConfig cfg) {
+    this(map, cfg, new SimulationClock());
+  }
+
+  Simulation(Grid<StaticEntities> map, SimulationConfig cfg, SimulationClock clock) {
     this.map = map;
     this.cfg = cfg;
+    this.clock = clock;
     this.occupancy = new GridOcuppancy(map.sizeX(), map.sizeY());
     this.distanceSource = new MapDistanceSource(map);
     scanMap();
@@ -86,6 +91,17 @@ public final class Simulation {
           seats.add(new SeatSpot(s, new Position(x, y)));
         }
       }
+    }
+    requireEntity("generator", generator, genPos);
+    requireEntity("remover", remover, removerPos);
+    requireEntity("totem", totem, totemPos);
+    requireEntity("nurse", nurse, nursePos);
+    requireEntity("medic", medic, medicPos);
+  }
+
+  private static void requireEntity(String name, StaticEntities entity, Position pos) {
+    if (entity == null) {
+      throw new IllegalArgumentException("Map is missing the required " + name + " entity.");
     }
   }
 
@@ -220,6 +236,7 @@ public final class Simulation {
       Patient p = inTriage;
       inTriage = null;
       p.completeTriage(manchester);
+      nurse.release();
       medicQueue.enqueue(p);
       p.waitStart(t);
       goToSeat(p);
@@ -228,6 +245,7 @@ public final class Simulation {
       Patient p = inConsult;
       inConsult = null;
       p.completeConsultation();
+      medic.release();
       p.target(remover);
     }
   }
@@ -276,6 +294,9 @@ public final class Simulation {
           break;
         case WAITING_FOR_TRIAGE:
         case WAITING_FOR_MEDIC:
+          if (p.target() == null) {
+            goToSeat(p);
+          }
           if (p.targetPosition() != null && samePos(p.pos(), p.targetPosition())) {
             if (p.target() instanceof StaticEntities.Seat s) {
               s.occupy();
