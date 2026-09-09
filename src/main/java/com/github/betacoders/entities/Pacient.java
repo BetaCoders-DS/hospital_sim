@@ -1,5 +1,7 @@
 package com.github.betacoders.entities;
 
+import com.github.betacoders.types.NoManchester.Cor;
+import com.github.betacoders.types.collections.ArvoreManchester;
 import com.github.betacoders.types.Position;
 import com.github.betacoders.types.Vitals;
 
@@ -29,6 +31,7 @@ public class Pacient
   private StaticEntities target;
 
   private Vitals vitals;
+  private Cor corManchester;
   private boolean preferential;
   private int ticketNum = 0; // Starts at 0, representing an invalid state
 
@@ -36,6 +39,48 @@ public class Pacient
     this.pos = pos;
     this.preferential = preferential;
     this.target = new StaticEntities.Totem();
+  }
+
+  public Pacient(Position pos, boolean preferential, Vitals vitals)
+  {
+    this(pos, preferential);
+
+    if (vitals == null)
+    {
+      throw new IllegalArgumentException("Os sinais vitais nao podem ser nulos.");
+    }
+
+    this.vitals = vitals;
+  }
+
+  public Cor getCorManchester()
+  {
+    return corManchester;
+  }
+
+  // O controlador chama este metodo quando o tempo de triagem termina.
+  public void concluirTriagem(ArvoreManchester arvore)
+  {
+    if (state != State.EM_TRIAGEM)
+    {
+      throw new IllegalStateException("O paciente precisa estar em triagem.");
+    }
+
+    if (vitals == null)
+    {
+      throw new IllegalStateException("O paciente precisa ter sinais vitais cadastrados.");
+    }
+
+    if (arvore == null)
+    {
+      throw new IllegalArgumentException("A arvore de Manchester nao pode ser nula.");
+    }
+
+    float[] atributos = {
+        vitals.oxigenSat(), vitals.bodyTemp(), vitals.painLevel(), vitals.conscious()
+    };
+    corManchester = arvore.classificar(atributos);
+    mudarEstado(State.FILA_MEDICO);
   }
 
   public State getState()
@@ -64,7 +109,7 @@ public class Pacient
         permitida = novoEstado == State.EM_TRIAGEM;
         break;
       case EM_TRIAGEM:
-        permitida = novoEstado == State.FILA_MEDICO;
+        permitida = novoEstado == State.FILA_MEDICO && corManchester != null;
         break;
       case FILA_MEDICO:
         permitida = novoEstado == State.INDO_MEDICO;
