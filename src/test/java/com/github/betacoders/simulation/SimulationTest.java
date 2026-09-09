@@ -6,11 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.junit.jupiter.api.Test;
 
 import com.github.betacoders.TestMaps;
@@ -21,6 +16,10 @@ import com.github.betacoders.grid.Grid;
 import com.github.betacoders.time.SimulationClock;
 import com.github.betacoders.types.ManchesterNode.Color;
 import com.github.betacoders.types.Position;
+import com.github.betacoders.types.collections.HashMap;
+import com.github.betacoders.types.collections.HashSet;
+import com.github.betacoders.types.collections.Map;
+import com.github.betacoders.types.collections.Set;
 
 public class SimulationTest {
 
