@@ -11,6 +11,16 @@ public class Movement {
   private static final int[] DY = { -1, 1, 0, 0 };
 
   private static Position bestNeighbor(Position cur, Grid<Integer> dist, GridOcuppancy occupancy) {
+    int curDist = dist.get(cur.x, cur.y);
+
+    // Ja chegou no alvo (distancia 0): nao ha motivo pra sair da celula.
+    // Sem essa checagem, o paciente saia pro vizinho mais proximo (distancia 1)
+    // e no quadro seguinte via que a propria celula de origem (distancia 0)
+    // era a "melhor vizinha" e voltava - ficando preso indo e voltando entre
+    // as duas celulas para sempre.
+    if (curDist == 0)
+      return null;
+
     Position[] candidates = new Position[DX.length];
     int[] dists = new int[DX.length];
     int count = 0;
@@ -24,6 +34,13 @@ public class Movement {
 
       int d = dist.get(nx, ny);
       if (d == -1)
+        continue;
+
+      // So aceita vizinhos que realmente aproximam do alvo. Isso evita que o
+      // paciente ande para um lado so pra, no quadro seguinte, perceber que a
+      // celula de onde veio tem distancia menor e volte - o mesmo efeito de
+      // "vai e volta" citado acima, só que a meio caminho em vez de no alvo.
+      if (curDist != -1 && d >= curDist)
         continue;
 
       candidates[count] = new Position(nx, ny);

@@ -630,7 +630,9 @@ public final class Simulation {
    * Only patients that actually need to move
    * are sent to the movement system.
    *
-   * Waiting patients stay in their seats.
+   * WAITING_FOR_TRIAGE/WAITING_FOR_MEDIC still walk to their
+   * seat here; once seated (or once no seat is available),
+   * Movement simply stops producing intentions for them.
    */
   private void movePatients() {
 
@@ -644,14 +646,21 @@ public final class Simulation {
         case GOING_TO_TOTEM,
              GOING_TO_TRIAGE,
              GOING_TO_MEDIC,
-             GOING_TO_REMOVER ->
+             GOING_TO_REMOVER,
+             WAITING_FOR_TRIAGE,
+             WAITING_FOR_MEDIC ->
 
+            // WAITING_FOR_TRIAGE/WAITING_FOR_MEDIC tambem precisam passar pelo
+            // Movement: e nesses estados que o paciente anda ate a cadeira
+            // (target = Seat, definido em goToSeat()). Uma vez sentado
+            // (pos == targetPosition, distancia 0), o Movement corrigido
+            // simplesmente para de gerar intencao de movimento pra ele - ele
+            // so volta a andar quando a enfermeira/medico o chamar e o target
+            // mudar pra Nurse/Medic (GOING_TO_TRIAGE/GOING_TO_MEDIC).
             moving.addLast(p);
 
         case AT_TOTEM,
-             WAITING_FOR_TRIAGE,
              IN_TRIAGE,
-             WAITING_FOR_MEDIC,
              IN_CONSULTATION,
              REMOVED -> {
         }
