@@ -46,7 +46,6 @@ public class Movement {
     visited[start.y][start.x] = true;
 
     while (front < back) {
-
       Position current = queue[front++];
 
       if (samePos(current, target)) {
@@ -54,16 +53,13 @@ public class Movement {
       }
 
       for (int i = 0; i < DX.length; ++i) {
-
         int nx = current.x + DX[i];
-
         int ny = current.y + DY[i];
 
         if (nx < 0
             || nx >= width
             || ny < 0
             || ny >= height) {
-
           continue;
         }
 
@@ -80,14 +76,11 @@ public class Movement {
         if (!samePos(next, target)
             && !samePos(next, start)
             && !occupancy.isFree(next)) {
-
           continue;
         }
 
         visited[ny][nx] = true;
-
         previous[ny][nx] = current;
-
         queue[back++] = next;
       }
     }

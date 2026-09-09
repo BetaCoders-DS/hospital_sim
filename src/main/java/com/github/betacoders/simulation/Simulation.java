@@ -89,38 +89,30 @@ public final class Simulation {
   private void scanMap() {
 
     for (int y = 0; y < map.sizeY(); ++y) {
-
       for (int x = 0; x < map.sizeX(); ++x) {
-
         StaticEntities e = map.get(x, y);
 
         if (e instanceof StaticEntities.Generator g) {
-
           generator = g;
           genPos = new Position(x, y);
 
         } else if (e instanceof StaticEntities.Remover r) {
-
           remover = r;
           removerPos = new Position(x, y);
 
         } else if (e instanceof StaticEntities.Totem t) {
-
           totem = t;
           totemPos = new Position(x, y);
 
         } else if (e instanceof StaticEntities.Nurse n) {
-
           nurse = n;
           nursePos = new Position(x, y);
 
         } else if (e instanceof StaticEntities.Medic m) {
-
           medic = m;
           medicPos = new Position(x, y);
 
         } else if (e instanceof StaticEntities.Seat s) {
-
           seats.add(
               new SeatSpot(
                   s,
@@ -133,22 +125,18 @@ public final class Simulation {
         "generator",
         generator,
         genPos);
-
     requireEntity(
         "remover",
         remover,
         removerPos);
-
     requireEntity(
         "totem",
         totem,
         totemPos);
-
     requireEntity(
         "nurse",
         nurse,
         nursePos);
-
     requireEntity(
         "medic",
         medic,
@@ -170,27 +158,20 @@ public final class Simulation {
   }
 
   private void buildTicketQueuePositions() {
-
     Grid<Integer> distances = Wavefront.calculate(
         map,
         totemPos);
-
     LinkedList<Position> path = new LinkedList<>();
-
     Position current = new Position(
         genPos.x,
         genPos.y);
 
     path.addLast(current);
-
     while (!samePos(current, totemPos)) {
-
       int currentDistance = distances.get(
           current.x,
           current.y);
-
       if (currentDistance <= 0) {
-
         throw new IllegalArgumentException(
             "No path from generator to totem.");
       }
@@ -198,7 +179,6 @@ public final class Simulation {
       Position next = null;
 
       for (int i = 0; i < DX.length; ++i) {
-
         int nx = current.x + DX[i];
         int ny = current.y + DY[i];
 
@@ -206,20 +186,16 @@ public final class Simulation {
             || nx >= map.sizeX()
             || ny < 0
             || ny >= map.sizeY()) {
-
           continue;
         }
 
         if (distances.get(nx, ny) == currentDistance - 1) {
-
           next = new Position(nx, ny);
-
           break;
         }
       }
 
       if (next == null) {
-
         throw new IllegalArgumentException(
             "Could not build generator-to-totem queue path.");
       }
@@ -235,13 +211,11 @@ public final class Simulation {
             - 1);
 
     for (int i = path.size() - 2; i >= firstIndex; --i) {
-
       ticketQueuePositions.addLast(
           path.get(i));
     }
 
     if (ticketQueuePositions.size() < TICKET_QUEUE_CAPACITY) {
-
       throw new IllegalArgumentException(
           "The map does not have enough space "
               + "for the ticket queue.");
@@ -249,7 +223,6 @@ public final class Simulation {
   }
 
   public void reset() {
-
     for (SeatSpot spot : seats) {
       spot.seat().release();
     }
@@ -280,13 +253,11 @@ public final class Simulation {
   }
 
   public void step() {
-
     if (paused) {
       return;
     }
 
     clock.update();
-
     double t = clock.getTimePassed();
 
     trySpawn(t);
@@ -305,13 +276,11 @@ public final class Simulation {
   }
 
   public void pause() {
-
     paused = true;
     clock.pause();
   }
 
   public void resume() {
-
     paused = false;
     clock.resume();
   }
@@ -369,7 +338,6 @@ public final class Simulation {
   }
 
   private void trySpawn(double t) {
-
     if (t < nextSpawnAt) {
       return;
     }
@@ -378,7 +346,6 @@ public final class Simulation {
         cfg.spawnAvg());
 
     if (ticketQueue.size() >= TICKET_QUEUE_CAPACITY) {
-
       return;
     }
 
@@ -405,11 +372,8 @@ public final class Simulation {
   }
 
   private void updateTicketQueueTargets() {
-
     for (int i = 0; i < ticketQueue.size(); ++i) {
-
       Patient p = ticketQueue.get(i);
-
       if (i == 0
           && samePos(
               p.pos(),
@@ -421,16 +385,13 @@ public final class Simulation {
 
         continue;
       }
-
       Position slot = ticketQueuePositions.get(i);
 
       Position currentTarget = p.targetPosition();
-
       if (currentTarget != null
           && samePos(
               currentTarget,
               slot)) {
-
         continue;
       }
 
@@ -440,7 +401,6 @@ public final class Simulation {
   }
 
   private Vitals generateVitals() {
-
     int o2 = clampInt(
         rng.nextGaussian()
             * cfg.o2Dev()
@@ -479,7 +439,6 @@ public final class Simulation {
       double hi) {
 
     int x = (int) Math.round(v);
-
     return (int) Math.max(
         lo,
         Math.min(hi, x));
@@ -487,18 +446,13 @@ public final class Simulation {
 
   private void checkServiceCompletions(
       double t) {
-
     if (inTriage != null
         && t >= nurseBusyUntil) {
-
       Patient p = inTriage;
 
       inTriage = null;
-
       p.completeTriage(manchester);
-
       nurse.release();
-
       medicQueue.enqueue(p);
 
       p.waitStart(t);
@@ -510,11 +464,9 @@ public final class Simulation {
         && t >= medicBusyUntil) {
 
       Patient p = inConsult;
-
       inConsult = null;
 
       p.completeConsultation();
-
       medic.release();
 
       p.target(remover);
@@ -522,42 +474,30 @@ public final class Simulation {
   }
 
   private void checkIdleStations() {
-
     if (nurse.isIdle()) {
-
       Patient next = nurse.callNext(
           triageQueue);
-
       if (next != null) {
-
         inTriage = next;
-
         nurseBusyUntil = Double.POSITIVE_INFINITY;
       }
     }
 
     if (medic.isIdle()) {
-
       Patient next = medic.callNext(
           medicQueue);
-
       if (next != null) {
-
         inConsult = next;
-
         medicBusyUntil = Double.POSITIVE_INFINITY;
       }
     }
   }
 
   private void movePatients() {
-
     LinkedList<Patient> moving = new LinkedList<>();
 
     for (Patient p : patients) {
-
       switch (p.getState()) {
-
         case GOING_TO_TOTEM,
             GOING_TO_TRIAGE,
             GOING_TO_MEDIC,
@@ -587,47 +527,34 @@ public final class Simulation {
   }
 
   private void updateLifecycle(double t) {
-
     for (Patient p : patients) {
-
       switch (p.getState()) {
-
         case GOING_TO_TOTEM:
-
           if (samePos(
               p.pos(),
               totemPos)) {
-
             p.changeState(
                 Patient.State.AT_TOTEM);
-
             totem.issueTicket(p);
-
             ticketQueue.remove(p);
-
             triageQueue.enqueue(p);
-
             p.waitStart(t);
 
             goToSeat(p);
           }
-
           break;
 
         case WAITING_FOR_TRIAGE:
         case WAITING_FOR_MEDIC:
-
           if (p.target() == null) {
             goToSeat(p);
           }
-
           if (p.targetPosition() != null
               && samePos(
                   p.pos(),
                   p.targetPosition())) {
 
             if (p.target() instanceof StaticEntities.Seat s) {
-
               s.occupy();
             }
           }
@@ -635,61 +562,46 @@ public final class Simulation {
           break;
 
         case GOING_TO_TRIAGE:
-
           if (adjacent(
               p.pos(),
               nursePos)) {
-
             p.startTriage();
-
             nurseBusyUntil = t + GeneratorTimer.serviceTime(
                 cfg.triageAvg(),
                 cfg.triageDev(),
                 cfg.triageMin());
-
             p.waitAccum(
                 p.waitAccum()
                     + (t - p.waitStart()));
           }
-
           break;
 
         case GOING_TO_MEDIC:
-
           if (adjacent(
               p.pos(),
               medicPos)) {
-
             p.startConsultation();
-
             medicBusyUntil = t + GeneratorTimer.serviceTime(
                 cfg.consultAvg(),
                 cfg.consultDev(),
                 cfg.consultMin());
-
             p.waitAccum(
                 p.waitAccum()
                     + (t - p.waitStart()));
           }
-
           break;
 
         case GOING_TO_REMOVER:
-
           if (samePos(
               p.pos(),
               removerPos)) {
-
             p.arriveAtRemover();
-
             occupancy.free(
                 removerPos);
-
             stats.logPacientExit(
                 p.waitAccum(),
                 t - p.spawnTime());
           }
-
           break;
 
         case AT_TOTEM:
@@ -702,18 +614,13 @@ public final class Simulation {
   }
 
   private void goToSeat(Patient p) {
-
     SeatSpot spot = nearestFreeSeat(
         p.pos());
 
     if (spot == null) {
-
       p.target(null);
-
     } else {
-
       spot.seat().reserve();
-
       p.target(
           spot.seat());
     }
@@ -721,17 +628,13 @@ public final class Simulation {
 
   private SeatSpot nearestFreeSeat(
       Position from) {
-
     boolean[][] visited = new boolean[map.sizeY()][map.sizeX()];
-
     LinkedList<Position> queue = new LinkedList<>();
 
     visited[from.y][from.x] = true;
-
     queue.addLast(from);
 
     while (!queue.isEmpty()) {
-
       Position cur = queue.removeFirst();
 
       StaticEntities e = map.get(
@@ -740,23 +643,19 @@ public final class Simulation {
 
       if (e instanceof StaticEntities.Seat s
           && s.isFree()) {
-
         return new SeatSpot(
             s,
             cur);
       }
 
       for (int i = 0; i < DX.length; ++i) {
-
         int nx = cur.x + DX[i];
-
         int ny = cur.y + DY[i];
 
         if (nx < 0
             || nx >= map.sizeX()
             || ny < 0
             || ny >= map.sizeY()) {
-
           continue;
         }
 
@@ -765,7 +664,6 @@ public final class Simulation {
         }
 
         StaticEntities ne = map.get(nx, ny);
-
         if (ne instanceof StaticEntities.Wall
             || ne instanceof StaticEntities.Nurse
             || ne instanceof StaticEntities.Medic) {
@@ -774,7 +672,6 @@ public final class Simulation {
         }
 
         visited[ny][nx] = true;
-
         queue.addLast(
             new Position(
                 nx,
@@ -786,13 +683,10 @@ public final class Simulation {
   }
 
   private void purge() {
-
     Vector<Patient> removed = new Vector<>();
 
     for (Patient p : patients) {
-
       if (p.getState() == Patient.State.REMOVED) {
-
         removed.add(p);
       }
     }
@@ -805,7 +699,6 @@ public final class Simulation {
   private static boolean samePos(
       Position a,
       Position b) {
-
     return a.x == b.x
         && a.y == b.y;
   }
