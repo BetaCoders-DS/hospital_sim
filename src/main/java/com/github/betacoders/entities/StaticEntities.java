@@ -49,7 +49,7 @@ public sealed interface StaticEntities {
     private int lastNormalTicket = 0;
     private int lastPreferentialTicket = 0;
 
-    public void issueTicket(Pacient patient)
+    public void issueTicket(Patient patient)
     {
       if (patient == null)
       {
@@ -84,31 +84,31 @@ public sealed interface StaticEntities {
 
     //3 estados possiveis do assento
     public enum State {
-      LIVRE, RESERVADO, OCUPADO
+      FREE, RESERVED, OCCUPIED
 
     }
 
-    private State state = State.LIVRE;  //assento comeca livre por padrao
+    private State state = State.FREE;  //assento comeca livre por padrao
 
 
     //metodo para marcar o assento como ocupado
-    public void ocupar() {
-      state = State.OCUPADO;
+    public void occupy() {
+      state = State.OCCUPIED;
     }
 
     //metodo para marcar o assento como reservado
-    public void reservar() {
-      state = State.RESERVADO;
+    public void reserve() {
+      state = State.RESERVED;
     }
 
     //metodo para marcar o assento como liberado
-    public void liberar() {
-      state = State.LIVRE;
+    public void release() {
+      state = State.FREE;
     }
 
     //consulta se o assento esta livre para ser reservado
-    public boolean estaLivre() {
-      return state == State.LIVRE; //compara o estado atual com LIVRE
+    public boolean isFree() {
+      return state == State.FREE; //compara o estado atual com LIVRE
     }
 
     //retorna o estado do assento
@@ -128,24 +128,24 @@ public sealed interface StaticEntities {
 
     //2 possiveis estados da enfermaria
     public enum State {
-      OCIOSO, OCUPADO
+      IDLE, OCCUPIED
     }
 
-    private State state = State.OCIOSO; //enfermeira comeca ociosa por padrao
+    private State state = State.IDLE; //enfermeira comeca ociosa por padrao
 
     //marca a enfermeira como ocupada (paciente comeca a ser atendido)
-    public void ocupar() {
-      state = State.OCUPADO;
+    public void occupy() {
+      state = State.OCCUPIED;
     }
 
     //libera a enfermeira, voltando ao estado ocioso (fim do atendimento ou reset)
-    public void liberar() {
-      state = State.OCIOSO;
+    public void release() {
+      state = State.IDLE;
     }
 
     //retorna se a enfermeira esta livre para chamar o proximo paciente
-    public boolean estaOciosa() {
-      return state == State.OCIOSO;
+    public boolean isIdle() {
+      return state == State.IDLE;
     }
 
     //retorna o estado da enfermeira
@@ -163,24 +163,24 @@ public sealed interface StaticEntities {
 
     //2 possiveis estados do medico
     public enum State {
-      OCIOSO, OCUPADO
+      IDLE, OCCUPIED
     }
 
-    private State state = State.OCIOSO; //medico comeca ocioso por padrao
+    private State state = State.IDLE; //medico comeca ocioso por padrao
 
     //marca o medico como ocupado (paciente comeca a ser atendido)
-    public void ocupar() {
-      state = State.OCUPADO;
+    public void occupy() {
+      state = State.OCCUPIED;
     }
 
     //libera o medico, voltando ao estado ocioso (fim da consulta ou reset)
-    public void liberar() {
-      state = State.OCIOSO;
+    public void release() {
+      state = State.IDLE;
     }
 
     //retorna se o medico esta livre para chamar o proximo paciente
-    public boolean estaOcioso() {
-      return state == State.OCIOSO;
+    public boolean isIdle() {
+      return state == State.IDLE;
     }
     //retorna o estado do medico
     public State getState() {

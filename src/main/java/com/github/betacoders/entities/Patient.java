@@ -10,7 +10,7 @@ import com.github.betacoders.types.Vitals;
  * Única entidade móvel, é armazenada num grid secundario, e também
  * numa lista encadeada.
  */
-public class Pacient
+public class Patient
 {
   public enum State
   {
@@ -35,13 +35,13 @@ public class Pacient
   private boolean preferential;
   private int ticketNum = 0; // Starts at 0, representing an invalid state
 
-  public Pacient(Position pos, boolean preferential) {
+  public Patient(Position pos, boolean preferential) {
     this.pos = pos;
     this.preferential = preferential;
     this.target = new StaticEntities.Totem();
   }
 
-  public Pacient(Position pos, boolean preferential, Vitals vitals)
+  public Patient(Position pos, boolean preferential, Vitals vitals)
   {
     this(pos, preferential);
 

@@ -1,23 +1,23 @@
 package com.github.betacoders.simulation;
 
-import com.github.betacoders.entities.Pacient;
-import com.github.betacoders.entities.Pacient.State;
+import com.github.betacoders.entities.Patient;
+import com.github.betacoders.entities.Patient.State;
 import com.github.betacoders.types.ManchesterNode.Color;
 import com.github.betacoders.types.collections.LinkedList;
 
 public class MedicQueue
 {
-  private final LinkedList<Pacient> redPatients = new LinkedList<>();
-  private final LinkedList<Pacient> orangePatients = new LinkedList<>();
-  private final LinkedList<Pacient> yellowPatients = new LinkedList<>();
-  private final LinkedList<Pacient> greenPatients = new LinkedList<>();
-  private final LinkedList<Pacient> bluePatients = new LinkedList<>();
+  private final LinkedList<Patient> redPatients = new LinkedList<>();
+  private final LinkedList<Patient> orangePatients = new LinkedList<>();
+  private final LinkedList<Patient> yellowPatients = new LinkedList<>();
+  private final LinkedList<Patient> greenPatients = new LinkedList<>();
+  private final LinkedList<Patient> bluePatients = new LinkedList<>();
 
   private static final Color[] PRIORITY_ORDER = {
       Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN, Color.BLUE
   };
 
-  public void enqueue(Pacient patient)
+  public void enqueue(Patient patient)
   {
     if (patient == null)
     {
@@ -29,7 +29,7 @@ public class MedicQueue
       throw new IllegalStateException("The patient must be classified and waiting for a medic.");
     }
 
-    LinkedList<Pacient> queue = queueFor(patient.getManchesterColor());
+    LinkedList<Patient> queue = queueFor(patient.getManchesterColor());
     if (queue.contains(patient))
     {
       throw new IllegalStateException("The patient is already in the medic queue.");
@@ -40,11 +40,11 @@ public class MedicQueue
 
   // A cor define a prioridade. Dentro de cada cor, vale a ordem de chegada.
   // O controlador define o medico e o destino depois de retirar o paciente.
-  public Pacient dequeueNext()
+  public Patient dequeueNext()
   {
     for (int i = 0; i < PRIORITY_ORDER.length; i++)
     {
-      LinkedList<Pacient> queue = queueFor(PRIORITY_ORDER[i]);
+      LinkedList<Patient> queue = queueFor(PRIORITY_ORDER[i]);
       if (!queue.isEmpty())
       {
         return queue.removeFirst();
@@ -54,7 +54,7 @@ public class MedicQueue
     return null;
   }
 
-  private LinkedList<Pacient> queueFor(Color color)
+  private LinkedList<Patient> queueFor(Color color)
   {
     switch (color)
     {

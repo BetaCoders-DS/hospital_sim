@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.github.betacoders.entities.Pacient;
+import com.github.betacoders.entities.Patient;
 import com.github.betacoders.types.Position;
 
 /**
@@ -15,18 +15,18 @@ import com.github.betacoders.types.Position;
 public class AppTest {
 
   @Nested
-  class PacientTests {
-    Pacient p;
+  class PatientTests {
+    Patient p;
 
     @BeforeEach
     void setup() {
-      p = new Pacient(new Position(10, 10), true);
+      p = new Patient(new Position(10, 10), true);
     }
 
     @Test
     void throwsIfInvalid() {
       assertThrows(
-          Pacient.InvalidTicketNumberException.class,
+          Patient.InvalidTicketNumberException.class,
           () -> p.giveTicketNum(-1));
     }
   }

@@ -1,6 +1,6 @@
 package com.github.betacoders.movement;
 
-import com.github.betacoders.entities.Pacient;
+import com.github.betacoders.entities.Patient;
 import com.github.betacoders.grid.Grid;
 import com.github.betacoders.types.Position;
 import com.github.betacoders.types.collections.LinkedList;
