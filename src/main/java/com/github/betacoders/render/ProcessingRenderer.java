@@ -12,6 +12,10 @@ public class ProcessingRenderer implements RenderI {
     private PImage floorImage;
     private PImage seatImage;
     private PImage removerImage;
+    private PImage generatorImage;
+    private PImage totemImage;
+    private PImage nurseImage;
+    private PImage medicImage;
 
     public ProcessingRenderer(PApplet app) {
         this.app = app;
@@ -19,6 +23,10 @@ public class ProcessingRenderer implements RenderI {
         floorImage = app.loadImage("images/chao.png");
         seatImage = app.loadImage("images/seat.png");
         removerImage = app.loadImage("images/remover.png");
+        generatorImage = app.loadImage("images/generator.png");
+        totemImage = app.loadImage("images/totem.png");
+        nurseImage = app.loadImage("images/nurse.png");
+        medicImage = app.loadImage("images/medic.png");
     }
 
     @Override
@@ -47,7 +55,12 @@ public class ProcessingRenderer implements RenderI {
                 float px = offsetX + x * cellSize;
                 float py = offsetY + y * cellSize;
 
-                drawCell(map.get(x, y), px, py, cellSize);
+                drawCell(
+                        map.get(x, y),
+                        px,
+                        py,
+                        cellSize
+                );
             }
         }
     }
@@ -86,7 +99,13 @@ public class ProcessingRenderer implements RenderI {
 
     private void drawFloor(float x, float y, float size) {
         if (floorImage != null) {
-            app.image(floorImage, x, y, size, size);
+            app.image(
+                    floorImage,
+                    x,
+                    y,
+                    size,
+                    size
+            );
         } else {
             app.fill(242);
             app.stroke(220);
@@ -96,10 +115,17 @@ public class ProcessingRenderer implements RenderI {
 
     private void drawSeat(float x, float y, float size) {
         if (seatImage != null) {
-            app.image(seatImage, x, y, size, size);
+            app.image(
+                    seatImage,
+                    x,
+                    y,
+                    size,
+                    size
+            );
         } else {
             app.fill(145);
             app.stroke(65);
+
             app.rect(
                     x + size * 0.24f,
                     y + size * 0.24f,
@@ -111,10 +137,17 @@ public class ProcessingRenderer implements RenderI {
 
     private void drawRemover(float x, float y, float size) {
         if (removerImage != null) {
-            app.image(removerImage, x, y, size, size);
+            app.image(
+                    removerImage,
+                    x,
+                    y,
+                    size,
+                    size
+            );
         } else {
             app.fill(190);
             app.stroke(45);
+
             app.rect(
                     x + size * 0.2f,
                     y + size * 0.12f,
@@ -124,14 +157,79 @@ public class ProcessingRenderer implements RenderI {
         }
     }
 
+    private void drawGenerator(float x, float y, float size) {
+        drawFloor(x, y, size);
+
+        if (generatorImage != null) {
+            app.image(
+                    generatorImage,
+                    x,
+                    y,
+                    size,
+                    size
+            );
+        }
+    }
+
+    private void drawTotem(float x, float y, float size) {
+        drawFloor(x, y, size);
+
+        if (totemImage != null) {
+            app.image(
+                    totemImage,
+                    x,
+                    y,
+                    size,
+                    size
+            );
+        }
+    }
+
+    private void drawNurse(float x, float y, float size) {
+        drawFloor(x, y, size);
+
+        if (nurseImage != null) {
+            app.image(
+                    nurseImage,
+                    x,
+                    y,
+                    size,
+                    size
+            );
+        }
+    }
+
+    private void drawMedic(float x, float y, float size) {
+        drawFloor(x, y, size);
+
+        if (medicImage != null) {
+            app.image(
+                    medicImage,
+                    x,
+                    y,
+                    size,
+                    size
+            );
+        }
+    }
+
     private void drawWall(float x, float y, float size) {
         app.fill(75);
         app.stroke(45);
-        app.strokeWeight(Math.max(1, size * 0.025f));
-        app.rect(x, y, size, size);
+        app.strokeWeight(
+                Math.max(1, size * 0.025f)
+        );
+
+        app.rect(
+                x,
+                y,
+                size,
+                size
+        );
 
         app.fill(95);
         app.noStroke();
+
         app.rect(
                 x + size * 0.12f,
                 y + size * 0.12f,
@@ -140,7 +238,9 @@ public class ProcessingRenderer implements RenderI {
         );
 
         app.stroke(55);
-        app.strokeWeight(Math.max(1, size * 0.025f));
+        app.strokeWeight(
+                Math.max(1, size * 0.025f)
+        );
 
         app.line(
                 x + size * 0.08f,
@@ -168,210 +268,6 @@ public class ProcessingRenderer implements RenderI {
                 y + size * 0.48f,
                 x + size * 0.72f,
                 y + size * 0.8f
-        );
-    }
-
-    private void drawGenerator(float x, float y, float size) {
-        drawFloor(x, y, size);
-
-        app.stroke(45);
-        app.strokeWeight(Math.max(1, size * 0.04f));
-        app.fill(180);
-
-        app.rect(
-                x + size * 0.2f,
-                y + size * 0.16f,
-                size * 0.6f,
-                size * 0.68f,
-                size * 0.08f
-        );
-
-        app.fill(70);
-        app.rect(
-                x + size * 0.32f,
-                y + size * 0.32f,
-                size * 0.36f,
-                size * 0.28f
-        );
-
-        app.fill(80);
-        app.circle(
-                x + size * 0.5f,
-                y + size * 0.72f,
-                size * 0.12f
-        );
-
-        app.stroke(255);
-        app.strokeWeight(Math.max(1, size * 0.025f));
-
-        app.line(
-                x + size * 0.4f,
-                y + size * 0.43f,
-                x + size * 0.6f,
-                y + size * 0.43f
-        );
-
-        app.line(
-                x + size * 0.5f,
-                y + size * 0.35f,
-                x + size * 0.5f,
-                y + size * 0.51f
-        );
-    }
-
-    private void drawTotem(float x, float y, float size) {
-        drawFloor(x, y, size);
-
-        app.stroke(45);
-        app.strokeWeight(Math.max(1, size * 0.04f));
-        app.fill(155);
-
-        app.rect(
-                x + size * 0.28f,
-                y + size * 0.16f,
-                size * 0.44f,
-                size * 0.68f,
-                size * 0.08f
-        );
-
-        app.fill(35);
-        app.rect(
-                x + size * 0.36f,
-                y + size * 0.28f,
-                size * 0.28f,
-                size * 0.28f
-        );
-
-        app.fill(80);
-        app.circle(
-                x + size * 0.5f,
-                y + size * 0.7f,
-                size * 0.12f
-        );
-
-        app.stroke(220);
-        app.strokeWeight(Math.max(1, size * 0.025f));
-
-        app.line(
-                x + size * 0.4f,
-                y + size * 0.36f,
-                x + size * 0.6f,
-                y + size * 0.36f
-        );
-
-        app.line(
-                x + size * 0.4f,
-                y + size * 0.44f,
-                x + size * 0.56f,
-                y + size * 0.44f
-        );
-    }
-
-    private void drawNurse(float x, float y, float size) {
-        drawFloor(x, y, size);
-
-        app.stroke(50);
-        app.strokeWeight(Math.max(1, size * 0.025f));
-
-        app.fill(210);
-        app.rect(
-                x + size * 0.16f,
-                y + size * 0.48f,
-                size * 0.68f,
-                size * 0.32f,
-                size * 0.08f
-        );
-
-        app.fill(225);
-        app.rect(
-                x + size * 0.28f,
-                y + size * 0.24f,
-                size * 0.44f,
-                size * 0.32f,
-                size * 0.08f
-        );
-
-        app.fill(70);
-        app.rect(
-                x + size * 0.36f,
-                y + size * 0.32f,
-                size * 0.28f,
-                size * 0.12f
-        );
-
-        app.fill(240);
-        app.rect(
-                x + size * 0.46f,
-                y + size * 0.28f,
-                size * 0.08f,
-                size * 0.2f
-        );
-
-        app.fill(45);
-        app.circle(
-                x + size * 0.36f,
-                y + size * 0.68f,
-                size * 0.08f
-        );
-
-        app.circle(
-                x + size * 0.64f,
-                y + size * 0.68f,
-                size * 0.08f
-        );
-    }
-
-    private void drawMedic(float x, float y, float size) {
-        drawFloor(x, y, size);
-
-        app.stroke(50);
-        app.strokeWeight(Math.max(1, size * 0.025f));
-
-        app.fill(210);
-        app.rect(
-                x + size * 0.16f,
-                y + size * 0.44f,
-                size * 0.68f,
-                size * 0.36f,
-                size * 0.08f
-        );
-
-        app.fill(225);
-        app.rect(
-                x + size * 0.28f,
-                y + size * 0.2f,
-                size * 0.44f,
-                size * 0.32f,
-                size * 0.08f
-        );
-
-        app.fill(45);
-        app.rect(
-                x + size * 0.32f,
-                y + size * 0.28f,
-                size * 0.36f,
-                size * 0.08f
-        );
-
-        app.fill(240);
-        app.rect(
-                x + size * 0.46f,
-                y + size * 0.24f,
-                size * 0.08f,
-                size * 0.2f
-        );
-
-        app.fill(45);
-        app.circle(
-                x + size * 0.36f,
-                y + size * 0.66f,
-                size * 0.08f
-        );
-
-        app.circle(
-                x + size * 0.64f,
-                y + size * 0.66f,
-                size * 0.08f
         );
     }
 }
