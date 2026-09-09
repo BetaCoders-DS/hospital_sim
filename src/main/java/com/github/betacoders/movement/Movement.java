@@ -12,139 +12,193 @@ public class Movement {
   private static final int[] DY = { -1, 1, 0, 0 };
 
   /**
-   * Finds the best free neighbor.
+   * Finds a complete path from the patient to its target,
+   * considering other patients as temporary obstacles.
    *
-   * Normally the patient follows the Wavefront path.
-   * If another patient blocks that path, the method searches
-   * for another free neighbor instead of leaving the patient stuck.
+   * This prevents patients from oscillating between two cells
+   * when their normal Wavefront path is blocked.
    */
-  private static Position bestNeighbor(
-      Position cur,
-      Grid<Integer> dist,
+  private static Position findPathStep(
+      Patient patient,
+      Grid<Integer> staticDistances,
       GridOcuppancy occupancy) {
 
-    int curDist = dist.get(cur.x, cur.y);
+    Position start = patient.pos();
+    Position target = patient.targetPosition();
 
-    /*
-     * The patient has already reached its target.
-     */
-    if (curDist == 0) {
+    if (target == null) {
       return null;
     }
 
-    Position best = null;
-    int bestDistance = Integer.MAX_VALUE;
-
-    /*
-     * First try the normal Wavefront route.
-     * Only neighbors that get closer to the target are considered.
-     */
-    for (int i = 0; i < DX.length; ++i) {
-
-      int nx = cur.x + DX[i];
-      int ny = cur.y + DY[i];
-
-      if (nx < 0
-          || nx >= dist.sizeX()
-          || ny < 0
-          || ny >= dist.sizeY()) {
-        continue;
-      }
-
-      int d = dist.get(nx, ny);
-
-      if (d == -1) {
-        continue;
-      }
-
-      if (d >= curDist) {
-        continue;
-      }
-
-      Position candidate =
-          new Position(nx, ny);
-
-      if (!occupancy.isFree(candidate)) {
-        continue;
-      }
-
-      if (d < bestDistance) {
-        bestDistance = d;
-        best = candidate;
-      }
+    if (samePos(start, target)) {
+      return null;
     }
 
+    int width = staticDistances.sizeX();
+    int height = staticDistances.sizeY();
+
+    boolean[][] visited =
+        new boolean[height][width];
+
+    Position[][] previous =
+        new Position[height][width];
+
+    Position[] queue =
+        new Position[width * height];
+
+    int front = 0;
+    int back = 0;
+
+    queue[back++] =
+        new Position(
+            start.x,
+            start.y);
+
+    visited[start.y][start.x] = true;
+
     /*
-     * If the direct route is blocked, choose another free
-     * walkable neighbor.
+     * BFS from the patient's current position
+     * to the target.
      *
-     * This allows the patient to temporarily move away from
-     * the chair in order to go around another patient.
+     * Occupied cells are treated as obstacles.
+     * The target itself is always allowed.
      */
-    if (best == null) {
+    while (front < back) {
 
-      for (int i = 0; i < DX.length; ++i) {
+      Position current =
+          queue[front++];
 
-        int nx = cur.x + DX[i];
-        int ny = cur.y + DY[i];
+      if (samePos(current, target)) {
+        break;
+      }
+
+      for (int i = 0;
+           i < DX.length;
+           ++i) {
+
+        int nx =
+            current.x + DX[i];
+
+        int ny =
+            current.y + DY[i];
 
         if (nx < 0
-            || nx >= dist.sizeX()
+            || nx >= width
             || ny < 0
-            || ny >= dist.sizeY()) {
+            || ny >= height) {
+
           continue;
         }
 
-        int d = dist.get(nx, ny);
-
-        if (d == -1) {
-          continue;
-        }
-
-        Position candidate =
-            new Position(nx, ny);
-
-        if (!occupancy.isFree(candidate)) {
+        if (visited[ny][nx]) {
           continue;
         }
 
         /*
-         * Choose the free neighbor that is closest
-         * to the target among the available alternatives.
+         * Ignore cells that are unreachable in the
+         * static map. This preserves walls and other
+         * map obstacles.
          */
-        if (d < bestDistance) {
-          bestDistance = d;
-          best = candidate;
+        if (staticDistances.get(nx, ny) == -1) {
+          continue;
         }
+
+        Position next =
+            new Position(nx, ny);
+
+        /*
+         * Other patients are temporary obstacles.
+         *
+         * The target is allowed even if the occupancy
+         * system reports it as occupied.
+         */
+        if (!samePos(next, target)
+            && !samePos(next, start)
+            && !occupancy.isFree(next)) {
+
+          continue;
+        }
+
+        visited[ny][nx] = true;
+
+        previous[ny][nx] =
+            current;
+
+        queue[back++] = next;
       }
     }
 
-    return best;
+    /*
+     * No complete route exists right now.
+     *
+     * The patient remains still and the route will
+     * be calculated again on the next simulation step.
+     */
+    if (!visited[target.y][target.x]) {
+      return null;
+    }
+
+    /*
+     * Reconstruct the path backwards.
+     *
+     * We start at the target and walk backwards until
+     * reaching the patient's current position.
+     */
+    Position current =
+        new Position(
+            target.x,
+            target.y);
+
+    while (previous[current.y][current.x] != null) {
+
+      Position previousPosition =
+          previous[current.y][current.x];
+
+      /*
+       * This is the first cell the patient must enter.
+       */
+      if (samePos(previousPosition, start)) {
+        return current;
+      }
+
+      current = previousPosition;
+    }
+
+    return null;
   }
 
   public static LinkedList<MoveIntention> computeIntentions(
-      LinkedList<Patient> pa,
-      DistanceSource sour,
-      GridOcuppancy occ) {
+      LinkedList<Patient> patients,
+      DistanceSource source,
+      GridOcuppancy occupancy) {
 
     LinkedList<MoveIntention> intentions =
         new LinkedList<>();
 
-    for (Patient p : pa) {
+    for (Patient patient : patients) {
 
-      Grid<Integer> dist =
-          sour.distancesFor(p);
+      /*
+       * The static Wavefront is still calculated first.
+       * It tells us which cells are valid according
+       * to the map.
+       */
+      Grid<Integer> distances =
+          source.distancesFor(patient);
 
-      Position best =
-          bestNeighbor(
-              p.pos(),
-              dist,
-              occ);
+      /*
+       * Now calculate the actual route while treating
+       * other patients as obstacles.
+       */
+      Position next =
+          findPathStep(
+              patient,
+              distances,
+              occupancy);
 
       intentions.addLast(
           new MoveIntention(
-              p,
-              best));
+              patient,
+              next));
     }
 
     return intentions;
@@ -158,20 +212,24 @@ public class Movement {
         && a.y == b.y;
   }
 
+  /**
+   * Checks whether another patient has already claimed
+   * the same destination.
+   */
   private static boolean isFirstClaim(
-      MoveIntention mi,
+      MoveIntention intention,
       LinkedList<MoveIntention> all) {
 
     for (MoveIntention other : all) {
 
-      if (other == mi) {
+      if (other == intention) {
         return true;
       }
 
       if (other.next() != null
           && samePos(
               other.next(),
-              mi.next())) {
+              intention.next())) {
 
         return false;
       }
@@ -184,37 +242,46 @@ public class Movement {
       LinkedList<MoveIntention> intentions,
       GridOcuppancy occupancy) {
 
-    for (MoveIntention mi : intentions) {
+    for (MoveIntention intention : intentions) {
 
-      if (mi.next() == null) {
+      if (intention.next() == null) {
         continue;
       }
 
+      /*
+       * Only one patient can claim a cell.
+       */
       if (!isFirstClaim(
-          mi,
+          intention,
           intentions)) {
 
         continue;
       }
 
-      Position origem =
-          mi.patient().pos();
+      Position origin =
+          intention.patient().pos();
+
+      Position destination =
+          intention.next();
 
       /*
-       * The target cell must still be free when
-       * the movement is actually resolved.
+       * The destination may have become occupied
+       * since the intention was calculated.
+       *
+       * If that happened, the patient waits and
+       * recalculates the route on the next step.
        */
-      if (!occupancy.isFree(mi.next())) {
+      if (!occupancy.isFree(destination)) {
         continue;
       }
 
       occupancy.move(
-          origem,
-          mi.next(),
-          mi.patient());
+          origin,
+          destination,
+          intention.patient());
 
-      mi.patient().pos(
-          mi.next());
+      intention.patient().pos(
+          destination);
     }
   }
 }
