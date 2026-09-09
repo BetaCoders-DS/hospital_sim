@@ -6,7 +6,7 @@ import com.github.betacoders.types.Position;
 import com.github.betacoders.types.Vitals;
 
 /**
- * Pacient
+ * Patient
  * Única entidade móvel, é armazenada num grid secundario, e também
  * numa lista encadeada.
  */
@@ -58,6 +58,17 @@ public class Patient
     return manchesterColor;
   }
 
+  // O controlador chama quando o paciente chega ao posto da enfermeira.
+  public void startTriage()
+  {
+    if (state != State.GOING_TO_TRIAGE)
+    {
+      throw new IllegalStateException("The patient must be going to triage.");
+    }
+
+    changeState(State.IN_TRIAGE);
+  }
+
   // O controlador chama este metodo quando o tempo de triagem termina.
   public void completeTriage(ManchesterTree tree)
   {
@@ -81,6 +92,39 @@ public class Patient
     };
     manchesterColor = tree.classify(attributes);
     changeState(State.WAITING_FOR_MEDIC);
+  }
+
+  // O controlador chama quando o paciente chega ao consultorio.
+  public void startConsultation()
+  {
+    if (state != State.GOING_TO_MEDIC)
+    {
+      throw new IllegalStateException("The patient must be going to a medic.");
+    }
+
+    changeState(State.IN_CONSULTATION);
+  }
+
+  // O controlador chama quando o tempo da consulta termina.
+  public void completeConsultation()
+  {
+    if (state != State.IN_CONSULTATION)
+    {
+      throw new IllegalStateException("The patient must be in consultation.");
+    }
+
+    changeState(State.GOING_TO_REMOVER);
+  }
+
+  // O controlador chama quando o paciente pisa no removedor.
+  public void arriveAtRemover()
+  {
+    if (state != State.GOING_TO_REMOVER)
+    {
+      throw new IllegalStateException("The patient must be going to the remover.");
+    }
+
+    changeState(State.REMOVED);
   }
 
   public State getState()

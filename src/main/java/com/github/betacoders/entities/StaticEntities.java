@@ -1,6 +1,7 @@
 package com.github.betacoders.entities;
 
 import com.github.betacoders.simulation.MedicQueue;
+import com.github.betacoders.simulation.TriageQueue;
 
 /**
  * StaticEntities
@@ -135,13 +136,53 @@ public sealed interface StaticEntities {
 
     private State state = State.IDLE; //enfermeira comeca ociosa por padrao
 
+    private Patient currentPatient;
+
+    public Patient getCurrentPatient()
+    {
+      return currentPatient;
+    }
+
+    // A chamada reserva o posto; o tempo comeca somente na chegada.
+    public Patient callNext(TriageQueue queue)
+    {
+      if (queue == null)
+      {
+        throw new IllegalArgumentException("The triage queue cannot be null.");
+      }
+
+      if (!isIdle())
+      {
+        return null;
+      }
+
+      Patient patient = queue.dequeueNext();
+      if (patient == null)
+      {
+        return null;
+      }
+
+      patient.changeState(Patient.State.GOING_TO_TRIAGE);
+      if (patient.target() instanceof Seat seat)
+      {
+        seat.release();
+      }
+
+      patient.target(this);
+      currentPatient = patient;
+      occupy();
+      return patient;
+    }
+
     //marca a enfermeira como ocupada (paciente comeca a ser atendido)
     public void occupy() {
       state = State.OCCUPIED;
     }
 
     //libera a enfermeira, voltando ao estado ocioso (fim do atendimento ou reset)
-    public void release() {
+    public void release()
+    {
+      currentPatient = null;
       state = State.IDLE;
     }
 
