@@ -1,5 +1,7 @@
 package com.github.betacoders.entities;
 
+import com.github.betacoders.simulation.MedicQueue;
+
 /**
  * StaticEntities
  * Entidades que permanecem estáticas ao longo da simulação.
@@ -168,13 +170,53 @@ public sealed interface StaticEntities {
 
     private State state = State.IDLE; //medico comeca ocioso por padrao
 
+    private Patient currentPatient;
+
+    public Patient getCurrentPatient()
+    {
+      return currentPatient;
+    }
+
+    // Reserva o medico durante o deslocamento, sem iniciar a consulta ainda.
+    public Patient callNext(MedicQueue queue)
+    {
+      if (queue == null)
+      {
+        throw new IllegalArgumentException("The medic queue cannot be null.");
+      }
+
+      if (!isIdle())
+      {
+        return null;
+      }
+
+      Patient patient = queue.dequeueNext();
+      if (patient == null)
+      {
+        return null;
+      }
+
+      patient.changeState(Patient.State.GOING_TO_MEDIC);
+      if (patient.target() instanceof Seat seat)
+      {
+        seat.release();
+      }
+
+      patient.target(this);
+      currentPatient = patient;
+      occupy();
+      return patient;
+    }
+
     //marca o medico como ocupado (paciente comeca a ser atendido)
     public void occupy() {
       state = State.OCCUPIED;
     }
 
     //libera o medico, voltando ao estado ocioso (fim da consulta ou reset)
-    public void release() {
+    public void release()
+    {
+      currentPatient = null;
       state = State.IDLE;
     }
 
