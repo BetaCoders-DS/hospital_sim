@@ -44,7 +44,32 @@ public sealed interface StaticEntities {
    * paciente deve se deslocar ate o totem logo apos entrar no hospital. Apenas
    * um paciente pode interagir com cada totem por vez.
    */
-  public final class Totem implements StaticEntities {
+  public final class Totem implements StaticEntities
+  {
+    private int ultimaSenhaNormal = 0;
+    private int ultimaSenhaPreferencial = 0;
+
+    public void emitirSenha(Pacient paciente)
+    {
+      if (paciente == null)
+      {
+        throw new IllegalArgumentException("O paciente nao pode ser nulo.");
+      }
+
+      // O contador so avanca se o paciente receber a senha com sucesso.
+      if (paciente.preferential())
+      {
+        int numero = ultimaSenhaPreferencial + 1;
+        paciente.giveTicketNum(numero);
+        ultimaSenhaPreferencial = numero;
+      }
+      else
+      {
+        int numero = ultimaSenhaNormal + 1;
+        paciente.giveTicketNum(numero);
+        ultimaSenhaNormal = numero;
+      }
+    }
   }
 
   /**
