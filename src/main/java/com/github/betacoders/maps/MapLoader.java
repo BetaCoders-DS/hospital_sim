@@ -14,6 +14,7 @@ public class MapLoader {
     public MapLoader(PApplet app) {
         this.app = app;
     }
+
     public boolean load(String file) {
         String[] lines = app.loadStrings(file);
         if (lines == null || lines.length == 0) {
@@ -48,19 +49,16 @@ public class MapLoader {
 
         for (int y = 0; y < mapRows; y++) {
             String line = lines[y + 1];
-
             if (line.length() != mapColumns) {
                 return false;
             }
             for (int x = 0; x < mapColumns; x++) {
                 char symbol = line.charAt(x);
                 StaticEntities entity = createEntity(symbol);
-
                 if (entity == null) {
                     return false;
                 }
                 map.set(x, y, entity);
-
                 if (symbol == 'G') {
                     generators++;
                 }
@@ -102,6 +100,9 @@ public class MapLoader {
         if (generators != 1 || removers != 1) {
             return false;
         }
+        if (!hasClosedBorders()) {
+            return false;
+        }
         int[] generator = find(StaticEntities.Generator.class);
         int[] remover = find(StaticEntities.Remover.class);
 
@@ -112,8 +113,29 @@ public class MapLoader {
                 generator[0],
                 generator[1],
                 remover[0],
-                remover[1]
-        );
+                remover[1]);
+    }
+
+    private boolean hasClosedBorders() {
+        int width = map.sizeX();
+        int height = map.sizeY();
+        for (int x = 0; x < width; x++) {
+            if (!(map.get(x, 0) instanceof StaticEntities.Wall)) {
+                return false;
+            }
+            if (!(map.get(x, height - 1) instanceof StaticEntities.Wall)) {
+                return false;
+            }
+        }
+        for (int y = 0; y < height; y++) {
+            if (!(map.get(0, y) instanceof StaticEntities.Wall)) {
+                return false;
+            }
+            if (!(map.get(width - 1, y) instanceof StaticEntities.Wall)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private int[] find(Class<?> type) {
@@ -122,20 +144,20 @@ public class MapLoader {
                 StaticEntities entity = map.get(x, y);
 
                 if (type.isInstance(entity)) {
-                    return new int[]{x, y};
+                    return new int[] { x, y };
                 }
             }
         }
         return null;
     }
+
     private boolean hasPath(
             int startX,
             int startY,
             int targetX,
             int targetY) {
 
-        boolean[][] visited =
-                new boolean[map.sizeY()][map.sizeX()];
+        boolean[][] visited = new boolean[map.sizeY()][map.sizeX()];
 
         int capacity = map.sizeX() * map.sizeY();
         int[] queueX = new int[capacity];
@@ -149,8 +171,8 @@ public class MapLoader {
         back++;
         visited[startY][startX] = true;
 
-        int[] dx = {-1, 1, 0, 0};
-        int[] dy = {0, 0, -1, 1};
+        int[] dx = { -1, 1, 0, 0 };
+        int[] dy = { 0, 0, -1, 1 };
 
         while (front < back) {
             int x = queueX[front];
@@ -171,19 +193,18 @@ public class MapLoader {
                 if (visited[nextY][nextX]) {
                     continue;
                 }
-                if (map.get(nextX, nextY)
-                        instanceof StaticEntities.Wall) {
+                if (map.get(nextX, nextY) instanceof StaticEntities.Wall) {
                     continue;
                 }
                 visited[nextY][nextX] = true;
                 queueX[back] = nextX;
                 queueY[back] = nextY;
-
                 back++;
             }
         }
         return false;
     }
+
     private boolean isInsideMap(int x, int y) {
         return x >= 0
                 && x < map.sizeX()
