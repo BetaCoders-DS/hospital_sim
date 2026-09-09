@@ -1,9 +1,15 @@
 package com.github.betacoders.sketch;
 
+import com.github.betacoders.entities.Patient;
 import com.github.betacoders.entities.StaticEntities;
 import com.github.betacoders.grid.Grid;
 import com.github.betacoders.maps.MapLoader;
 import com.github.betacoders.render.ProcessingRenderer;
+import com.github.betacoders.simulation.Simulation;
+import com.github.betacoders.simulation.SimulationConfig;
+import com.github.betacoders.types.ManchesterNode.Color;
+import com.github.betacoders.types.Position;
+
 import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PImage;
@@ -16,12 +22,14 @@ public class Sketch extends PApplet {
     private ProcessingRenderer renderer;
     private MapLoader mapLoader;
     private Grid<StaticEntities> map;
+    private Simulation simulation;
 
     private PImage menuBackground;
 
     private PFont titleFont;
     private PFont buttonFont;
     private PFont smallFont;
+    private PFont patientFont;
 
     private enum Screen {
         MENU,
@@ -35,6 +43,13 @@ public class Sketch extends PApplet {
 
     private final int buttonWidth = 300;
     private final int buttonHeight = 60;
+
+    /*
+     * Controls how often the simulation advances.
+     * A larger value makes patients move more slowly.
+     */
+    private static final long SIMULATION_STEP_INTERVAL = 150;
+    private long lastSimulationStep = 0;
 
     private String[] availableMaps;
     private String selectedMap;
@@ -54,6 +69,7 @@ public class Sketch extends PApplet {
         titleFont = createFont("SansSerif.bold", 42);
         buttonFont = createFont("SansSerif.bold", 25);
         smallFont = createFont("SansSerif", 18);
+        patientFont = createFont("SansSerif.bold", 11);
 
         loadAvailableMaps();
     }
@@ -78,14 +94,148 @@ public class Sketch extends PApplet {
     }
 
     private void drawSimulation() {
+        if (simulation == null || map == null) {
+            currentScreen = Screen.MENU;
+            return;
+        }
+
+        /*
+         * Processing renders many frames per second.
+         * The simulation advances only every 150 ms.
+         */
+        long currentTime = millis();
+
+        if (currentTime - lastSimulationStep >= SIMULATION_STEP_INTERVAL) {
+            simulation.step();
+            lastSimulationStep = currentTime;
+        }
+
         renderer.renderMap(map);
+        drawPatients();
         drawSimulationHud();
+    }
+
+    private void drawPatients() {
+        float margin = 20;
+
+        float availableWidth = width - margin * 2;
+        float availableHeight = height - margin * 2;
+
+        float cellWidth = availableWidth / map.sizeX();
+        float cellHeight = availableHeight / map.sizeY();
+
+        float cellSize = Math.min(cellWidth, cellHeight);
+
+        float mapWidth = map.sizeX() * cellSize;
+        float mapHeight = map.sizeY() * cellSize;
+
+        float offsetX = (width - mapWidth) / 2;
+        float offsetY = (height - mapHeight) / 2;
+
+        for (Patient patient : simulation.patients()) {
+            if (patient.getState() == Patient.State.REMOVED) {
+                continue;
+            }
+
+            Position position = patient.pos();
+
+            float x = offsetX + position.x * cellSize;
+            float y = offsetY + position.y * cellSize;
+
+            drawPatient(patient, x, y, cellSize);
+        }
+    }
+
+    private void drawPatient(
+            Patient patient,
+            float x,
+            float y,
+            float size) {
+
+        float centerX = x + size / 2;
+        float centerY = y + size / 2;
+
+        float radius = size * 0.30f;
+
+        if (patient.preferential()) {
+            fill(255, 215, 0);
+        } else {
+            fill(70, 130, 255);
+        }
+
+        stroke(20);
+        strokeWeight(2);
+
+        ellipse(
+                centerX,
+                centerY,
+                radius * 2,
+                radius * 2
+        );
+
+        drawManchesterIndicator(
+                patient,
+                centerX,
+                centerY - radius * 0.9f,
+                radius * 0.45f
+        );
+
+        fill(20);
+        noStroke();
+
+        textAlign(CENTER, CENTER);
+        textFont(patientFont);
+
+        text(
+                patient.id(),
+                centerX,
+                centerY
+        );
+    }
+
+    private void drawManchesterIndicator(
+            Patient patient,
+            float x,
+            float y,
+            float radius) {
+
+        Color color = patient.getManchesterColor();
+
+        if (color == null) {
+            return;
+        }
+
+        if (color == Color.RED) {
+            fill(220, 40, 40);
+
+        } else if (color == Color.ORANGE) {
+            fill(255, 140, 0);
+
+        } else if (color == Color.YELLOW) {
+            fill(255, 220, 40);
+
+        } else if (color == Color.GREEN) {
+            fill(50, 190, 80);
+
+        } else {
+            fill(80, 150, 220);
+        }
+
+        stroke(20);
+        strokeWeight(1);
+
+        ellipse(
+                x,
+                y,
+                radius * 2,
+                radius * 2
+        );
     }
 
     private void drawSimulationHud() {
         int hudHeight = 42;
 
-        fill(10, 15, 20, 150);
+        fill(10, 15, 20, 190);
         noStroke();
         rect(0, 0, width, hudHeight);
 
@@ -97,6 +247,7 @@ public class Sketch extends PApplet {
 
         fill(255);
         textFont(smallFont);
+
         text(
                 "HOSPITAL SIMULATION",
                 20,
@@ -105,20 +256,63 @@ public class Sketch extends PApplet {
 
         fill(210);
         textFont(smallFont);
+
         text(
                 getMapDisplayName(selectedMap),
                 260,
                 hudHeight / 2
         );
 
+        if (simulation != null) {
+
+            fill(220);
+
+            text(
+                    "PATIENTS: " + simulation.activeCount(),
+                    500,
+                    hudHeight / 2
+            );
+
+            text(
+                    "SERVED: " + simulation.totalServed(),
+                    670,
+                    hudHeight / 2
+            );
+
+            int triageQueue =
+                    simulation.normalQueueSize()
+                            + simulation.preferentialQueueSize();
+
+            text(
+                    "TRIAGE QUEUE: " + triageQueue,
+                    800,
+                    hudHeight / 2
+            );
+
+            int[] medicQueues =
+                    simulation.medicQueueSizes();
+
+            int medicQueue =
+                    medicQueues[0]
+                            + medicQueues[1]
+                            + medicQueues[2];
+
+            text(
+                    "MEDIC QUEUE: " + medicQueue,
+                    1010,
+                    hudHeight / 2
+            );
+        }
+
         textAlign(RIGHT, CENTER);
 
         fill(220);
         textFont(smallFont);
+
         text(
                 "ESC - PAUSE",
                 width - 20,
-                hudHeight / 2
+                hudHeight
         );
     }
 
@@ -136,6 +330,7 @@ public class Sketch extends PApplet {
         fill(10, 15, 20, 120);
         stroke(240);
         strokeWeight(2);
+
         rect(
                 panelX,
                 panelY,
@@ -146,6 +341,7 @@ public class Sketch extends PApplet {
 
         stroke(170);
         strokeWeight(1);
+
         rect(
                 panelX + 10,
                 panelY + 10,
@@ -158,6 +354,7 @@ public class Sketch extends PApplet {
 
         fill(255);
         textFont(titleFont);
+
         text(
                 "HOSPITAL SIMULATION",
                 width / 2,
@@ -191,6 +388,7 @@ public class Sketch extends PApplet {
         fill(220);
         textFont(smallFont);
         textAlign(RIGHT, BOTTOM);
+
         text(
                 "v1.0",
                 panelX + panelWidth - 20,
@@ -212,6 +410,7 @@ public class Sketch extends PApplet {
         fill(10, 15, 20, 200);
         stroke(240);
         strokeWeight(2);
+
         rect(
                 panelX,
                 panelY,
@@ -224,6 +423,7 @@ public class Sketch extends PApplet {
 
         fill(255);
         textFont(titleFont);
+
         text(
                 "SELECT MAP",
                 width / 2,
@@ -233,8 +433,10 @@ public class Sketch extends PApplet {
         int mapButtonY = panelY + 140;
 
         if (availableMaps.length == 0) {
+
             fill(220);
             textFont(smallFont);
+
             text(
                     "No maps available",
                     width / 2,
@@ -242,6 +444,7 @@ public class Sketch extends PApplet {
             );
 
         } else {
+
             int maxMaps = 4;
 
             for (int i = 0;
@@ -280,7 +483,10 @@ public class Sketch extends PApplet {
     }
 
     private void drawPause() {
-        renderer.renderMap(map);
+        if (map != null) {
+            renderer.renderMap(map);
+            drawPatients();
+        }
 
         fill(0, 0, 0, 75);
         noStroke();
@@ -462,6 +668,7 @@ public class Sketch extends PApplet {
 
     private void drawBackground() {
         if (menuBackground != null) {
+
             imageMode(CORNER);
 
             image(
@@ -547,9 +754,22 @@ public class Sketch extends PApplet {
                 && mapLoader.isValid()) {
 
             map = mapLoader.getMap();
+
+            SimulationConfig config =
+                    SimulationConfig.defaults();
+
+            simulation =
+                    new Simulation(
+                            map,
+                            config
+                    );
+
+            lastSimulationStep = millis();
+
             currentScreen = Screen.SIMULATION;
 
         } else {
+            simulation = null;
             currentScreen = Screen.INVALID_MAP;
         }
     }
@@ -654,6 +874,10 @@ public class Sketch extends PApplet {
                     buttonWidth,
                     buttonHeight)) {
 
+                if (simulation != null) {
+                    simulation.resume();
+                }
+
                 currentScreen = Screen.SIMULATION;
 
             } else if (isInsideButton(
@@ -670,6 +894,8 @@ public class Sketch extends PApplet {
                     buttonWidth,
                     buttonHeight)) {
 
+                simulation = null;
+                map = null;
                 currentScreen = Screen.MENU;
             }
 
@@ -701,9 +927,17 @@ public class Sketch extends PApplet {
 
             if (currentScreen == Screen.SIMULATION) {
 
+                if (simulation != null) {
+                    simulation.pause();
+                }
+
                 currentScreen = Screen.PAUSE;
 
             } else if (currentScreen == Screen.PAUSE) {
+
+                if (simulation != null) {
+                    simulation.resume();
+                }
 
                 currentScreen = Screen.SIMULATION;
             }
