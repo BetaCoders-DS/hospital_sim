@@ -108,7 +108,7 @@ public class ProcessingRenderer implements RenderI {
             );
         } else {
             app.fill(242);
-            app.stroke(220);
+            app.noStroke();
             app.rect(x, y, size, size);
         }
     }
@@ -124,7 +124,7 @@ public class ProcessingRenderer implements RenderI {
             );
         } else {
             app.fill(145);
-            app.stroke(65);
+            app.noStroke();
 
             app.rect(
                     x + size * 0.24f,
@@ -146,7 +146,7 @@ public class ProcessingRenderer implements RenderI {
             );
         } else {
             app.fill(190);
-            app.stroke(45);
+            app.noStroke();
 
             app.rect(
                     x + size * 0.2f,
@@ -214,60 +214,14 @@ public class ProcessingRenderer implements RenderI {
     }
 
     private void drawWall(float x, float y, float size) {
-        app.fill(75);
-        app.stroke(45);
-        app.strokeWeight(
-                Math.max(1, size * 0.025f)
-        );
+        app.noStroke();
+        app.fill(215, 220, 225);
 
         app.rect(
                 x,
                 y,
                 size,
                 size
-        );
-
-        app.fill(95);
-        app.noStroke();
-
-        app.rect(
-                x + size * 0.12f,
-                y + size * 0.12f,
-                size * 0.76f,
-                size * 0.16f
-        );
-
-        app.stroke(55);
-        app.strokeWeight(
-                Math.max(1, size * 0.025f)
-        );
-
-        app.line(
-                x + size * 0.08f,
-                y + size * 0.48f,
-                x + size * 0.92f,
-                y + size * 0.48f
-        );
-
-        app.line(
-                x + size * 0.08f,
-                y + size * 0.8f,
-                x + size * 0.92f,
-                y + size * 0.8f
-        );
-
-        app.line(
-                x + size * 0.32f,
-                y + size * 0.12f,
-                x + size * 0.32f,
-                y + size * 0.48f
-        );
-
-        app.line(
-                x + size * 0.72f,
-                y + size * 0.48f,
-                x + size * 0.72f,
-                y + size * 0.8f
         );
     }
 }
