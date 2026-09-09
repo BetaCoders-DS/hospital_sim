@@ -1,5 +1,8 @@
 package com.github.betacoders.entities;
 
+import com.github.betacoders.simulation.MedicQueue;
+import com.github.betacoders.simulation.TriageQueue;
+
 /**
  * StaticEntities
  * Entidades que permanecem estáticas ao longo da simulação.
@@ -44,7 +47,39 @@ public sealed interface StaticEntities {
    * paciente deve se deslocar ate o totem logo apos entrar no hospital. Apenas
    * um paciente pode interagir com cada totem por vez.
    */
-  public final class Totem implements StaticEntities {
+  public final class Totem implements StaticEntities
+  {
+    private int lastNormalTicket = 0;
+    private int lastPreferentialTicket = 0;
+
+    public void issueTicket(Patient patient)
+    {
+      if (patient == null)
+      {
+        throw new IllegalArgumentException("The patient cannot be null.");
+      }
+
+      // O contador so avanca se o paciente receber a senha com sucesso.
+      if (patient.preferential())
+      {
+        int number = lastPreferentialTicket + 1;
+        patient.giveTicketNum(number);
+        lastPreferentialTicket = number;
+      }
+      else
+      {
+        int number = lastNormalTicket + 1;
+        patient.giveTicketNum(number);
+        lastNormalTicket = number;
+      }
+    }
+
+    // Zera os contadores de senhas (chamado durante o reset geral).
+    public void reset()
+    {
+      lastNormalTicket = 0;
+      lastPreferentialTicket = 0;
+    }
   }
 
   /**
@@ -59,31 +94,31 @@ public sealed interface StaticEntities {
 
     //3 estados possiveis do assento
     public enum State {
-      LIVRE, RESERVADO, OCUPADO
+      FREE, RESERVED, OCCUPIED
 
     }
 
-    private State state = State.LIVRE;  //assento comeca livre por padrao
+    private State state = State.FREE;  //assento comeca livre por padrao
 
 
     //metodo para marcar o assento como ocupado
-    public void ocupar() {
-      state = State.OCUPADO;
+    public void occupy() {
+      state = State.OCCUPIED;
     }
 
     //metodo para marcar o assento como reservado
-    public void reservar() {
-      state = State.RESERVADO;
+    public void reserve() {
+      state = State.RESERVED;
     }
 
     //metodo para marcar o assento como liberado
-    public void liberar() {
-      state = State.LIVRE;
+    public void release() {
+      state = State.FREE;
     }
 
     //consulta se o assento esta livre para ser reservado
-    public boolean estaLivre() {
-      return state == State.LIVRE; //compara o estado atual com LIVRE
+    public boolean isFree() {
+      return state == State.FREE; //compara o estado atual com LIVRE
     }
 
     //retorna o estado do assento
@@ -103,24 +138,64 @@ public sealed interface StaticEntities {
 
     //2 possiveis estados da enfermaria
     public enum State {
-      OCIOSO, OCUPADO
+      IDLE, OCCUPIED
     }
 
-    private State state = State.OCIOSO; //enfermeira comeca ociosa por padrao
+    private State state = State.IDLE; //enfermeira comeca ociosa por padrao
+
+    private Patient currentPatient;
+
+    public Patient getCurrentPatient()
+    {
+      return currentPatient;
+    }
+
+    // A chamada reserva o posto; o tempo comeca somente na chegada.
+    public Patient callNext(TriageQueue queue)
+    {
+      if (queue == null)
+      {
+        throw new IllegalArgumentException("The triage queue cannot be null.");
+      }
+
+      if (!isIdle())
+      {
+        return null;
+      }
+
+      Patient patient = queue.dequeueNext();
+      if (patient == null)
+      {
+        return null;
+      }
+
+      patient.changeState(Patient.State.GOING_TO_TRIAGE);
+      if (patient.target() instanceof Seat seat)
+      {
+        seat.release();
+      }
+
+      patient.target(this);
+      currentPatient = patient;
+      occupy();
+      return patient;
+    }
 
     //marca a enfermeira como ocupada (paciente comeca a ser atendido)
-    public void ocupar() {
-      state = State.OCUPADO;
+    public void occupy() {
+      state = State.OCCUPIED;
     }
 
     //libera a enfermeira, voltando ao estado ocioso (fim do atendimento ou reset)
-    public void liberar() {
-      state = State.OCIOSO;
+    public void release()
+    {
+      currentPatient = null;
+      state = State.IDLE;
     }
 
     //retorna se a enfermeira esta livre para chamar o proximo paciente
-    public boolean estaOciosa() {
-      return state == State.OCIOSO;
+    public boolean isIdle() {
+      return state == State.IDLE;
     }
 
     //retorna o estado da enfermeira
@@ -138,24 +213,64 @@ public sealed interface StaticEntities {
 
     //2 possiveis estados do medico
     public enum State {
-      OCIOSO, OCUPADO
+      IDLE, OCCUPIED
     }
 
-    private State state = State.OCIOSO; //medico comeca ocioso por padrao
+    private State state = State.IDLE; //medico comeca ocioso por padrao
+
+    private Patient currentPatient;
+
+    public Patient getCurrentPatient()
+    {
+      return currentPatient;
+    }
+
+    // Reserva o medico durante o deslocamento, sem iniciar a consulta ainda.
+    public Patient callNext(MedicQueue queue)
+    {
+      if (queue == null)
+      {
+        throw new IllegalArgumentException("The medic queue cannot be null.");
+      }
+
+      if (!isIdle())
+      {
+        return null;
+      }
+
+      Patient patient = queue.dequeueNext();
+      if (patient == null)
+      {
+        return null;
+      }
+
+      patient.changeState(Patient.State.GOING_TO_MEDIC);
+      if (patient.target() instanceof Seat seat)
+      {
+        seat.release();
+      }
+
+      patient.target(this);
+      currentPatient = patient;
+      occupy();
+      return patient;
+    }
 
     //marca o medico como ocupado (paciente comeca a ser atendido)
-    public void ocupar() {
-      state = State.OCUPADO;
+    public void occupy() {
+      state = State.OCCUPIED;
     }
 
     //libera o medico, voltando ao estado ocioso (fim da consulta ou reset)
-    public void liberar() {
-      state = State.OCIOSO;
+    public void release()
+    {
+      currentPatient = null;
+      state = State.IDLE;
     }
 
     //retorna se o medico esta livre para chamar o proximo paciente
-    public boolean estaOcioso() {
-      return state == State.OCIOSO;
+    public boolean isIdle() {
+      return state == State.IDLE;
     }
     //retorna o estado do medico
     public State getState() {
