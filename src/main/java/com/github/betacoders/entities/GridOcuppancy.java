@@ -31,11 +31,11 @@ public final class GridOcuppancy {
   }
 
   // Move um paciente de uma posicao para outra em uma unica operacao
-  public void move(Position from, Position to, Pacient pacient) {
+  public void move(Position from, Position to) {
+    Pacient pacient = pacientOn(from);  // descobre quem está saindo, sem precisar que informem
     free(from);
     occupy(to, pacient);
   }
-
   // Limpa todo o grid, voltando todas as células a null (usado no reset geral)
   public void clean() {
     for (Pacient[] row : grid) {
