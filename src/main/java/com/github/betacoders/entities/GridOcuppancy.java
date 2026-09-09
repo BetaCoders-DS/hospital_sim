@@ -3,7 +3,6 @@ package com.github.betacoders.entities;
 import com.github.betacoders.types.Position;
 
 public final class GridOcuppancy {
-
   private final Pacient[][] grid; // matriz: cada celula guarda o paciente que esta ali, ou null se vazia
 
   public GridOcuppancy(int width, int height) {

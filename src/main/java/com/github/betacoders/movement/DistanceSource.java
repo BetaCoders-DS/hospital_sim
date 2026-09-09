@@ -5,6 +5,7 @@ import com.github.betacoders.grid.Grid;
 
 /**
  * DistanceSource
+ * Ponte pro problema alvo -> posição, que ainda não foi resolvido.
  */
 public interface DistanceSource {
   Grid<Integer> distancesFor(Pacient pacient);

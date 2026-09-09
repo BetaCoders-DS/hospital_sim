@@ -11,6 +11,7 @@ import com.github.betacoders.types.Vitals;
 public class Pacient {
   private Position pos;
   private StaticEntities target;
+  private Position targetPos = null;
 
   private Vitals vitals;
   private boolean preferential;
@@ -42,6 +43,22 @@ public class Pacient {
     return out.toString();
   }
 
+  public Position pos() {
+    return pos;
+  }
+
+  public void pos(Position p) {
+    pos = p;
+  }
+
+  public Position targetPosition() {
+    return targetPos;
+  }
+
+  public void targetPosition(Position targetPos) {
+    this.targetPos = targetPos;
+  }
+
   public boolean preferential() {
     return preferential;
   }
@@ -52,6 +69,7 @@ public class Pacient {
 
   public void target(StaticEntities e) {
     target = e;
+    targetPos = null;
   }
 
   public class TicketAlreadyGivenException extends RuntimeException {
