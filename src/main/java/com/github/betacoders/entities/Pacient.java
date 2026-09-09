@@ -1,7 +1,7 @@
 package com.github.betacoders.entities;
 
-import com.github.betacoders.types.NoManchester.Cor;
-import com.github.betacoders.types.collections.ArvoreManchester;
+import com.github.betacoders.types.ManchesterNode.Color;
+import com.github.betacoders.types.collections.ManchesterTree;
 import com.github.betacoders.types.Position;
 import com.github.betacoders.types.Vitals;
 
@@ -14,24 +14,24 @@ public class Pacient
 {
   public enum State
   {
-    INDO_TOTEM,
-    NO_TOTEM,
-    FILA_TRIAGEM,
-    INDO_TRIAGEM,
-    EM_TRIAGEM,
-    FILA_MEDICO,
-    INDO_MEDICO,
-    EM_CONSULTA,
-    INDO_REMOVEDOR,
-    REMOVIDO
+    GOING_TO_TOTEM,
+    AT_TOTEM,
+    WAITING_FOR_TRIAGE,
+    GOING_TO_TRIAGE,
+    IN_TRIAGE,
+    WAITING_FOR_MEDIC,
+    GOING_TO_MEDIC,
+    IN_CONSULTATION,
+    GOING_TO_REMOVER,
+    REMOVED
   }
 
-  private State state = State.INDO_TOTEM;
+  private State state = State.GOING_TO_TOTEM;
   private Position pos;
   private StaticEntities target;
 
   private Vitals vitals;
-  private Cor corManchester;
+  private Color manchesterColor;
   private boolean preferential;
   private int ticketNum = 0; // Starts at 0, representing an invalid state
 
@@ -47,40 +47,40 @@ public class Pacient
 
     if (vitals == null)
     {
-      throw new IllegalArgumentException("Os sinais vitais nao podem ser nulos.");
+      throw new IllegalArgumentException("Vital signs cannot be null.");
     }
 
     this.vitals = vitals;
   }
 
-  public Cor getCorManchester()
+  public Color getManchesterColor()
   {
-    return corManchester;
+    return manchesterColor;
   }
 
   // O controlador chama este metodo quando o tempo de triagem termina.
-  public void concluirTriagem(ArvoreManchester arvore)
+  public void completeTriage(ManchesterTree tree)
   {
-    if (state != State.EM_TRIAGEM)
+    if (state != State.IN_TRIAGE)
     {
-      throw new IllegalStateException("O paciente precisa estar em triagem.");
+      throw new IllegalStateException("The patient must be in triage.");
     }
 
     if (vitals == null)
     {
-      throw new IllegalStateException("O paciente precisa ter sinais vitais cadastrados.");
+      throw new IllegalStateException("The patient must have registered vital signs.");
     }
 
-    if (arvore == null)
+    if (tree == null)
     {
-      throw new IllegalArgumentException("A arvore de Manchester nao pode ser nula.");
+      throw new IllegalArgumentException("The Manchester tree cannot be null.");
     }
 
-    float[] atributos = {
+    float[] attributes = {
         vitals.oxigenSat(), vitals.bodyTemp(), vitals.painLevel(), vitals.conscious()
     };
-    corManchester = arvore.classificar(atributos);
-    mudarEstado(State.FILA_MEDICO);
+    manchesterColor = tree.classify(attributes);
+    changeState(State.WAITING_FOR_MEDIC);
   }
 
   public State getState()
@@ -90,50 +90,50 @@ public class Pacient
 
   // O controlador avisa as chegadas, chamadas e conclusoes de atendimento.
   // Esperar ou caminhar mais um quadro nao exige mudar de estado.
-  public void mudarEstado(State novoEstado)
+  public void changeState(State newState)
   {
-    boolean permitida = false;
+    boolean allowed = false;
 
     switch (state)
     {
-      case INDO_TOTEM:
-        permitida = novoEstado == State.NO_TOTEM;
+      case GOING_TO_TOTEM:
+        allowed = newState == State.AT_TOTEM;
         break;
-      case NO_TOTEM:
-        permitida = novoEstado == State.FILA_TRIAGEM && ticketNum > 0;
+      case AT_TOTEM:
+        allowed = newState == State.WAITING_FOR_TRIAGE && ticketNum > 0;
         break;
-      case FILA_TRIAGEM:
-        permitida = novoEstado == State.INDO_TRIAGEM;
+      case WAITING_FOR_TRIAGE:
+        allowed = newState == State.GOING_TO_TRIAGE;
         break;
-      case INDO_TRIAGEM:
-        permitida = novoEstado == State.EM_TRIAGEM;
+      case GOING_TO_TRIAGE:
+        allowed = newState == State.IN_TRIAGE;
         break;
-      case EM_TRIAGEM:
-        permitida = novoEstado == State.FILA_MEDICO && corManchester != null;
+      case IN_TRIAGE:
+        allowed = newState == State.WAITING_FOR_MEDIC && manchesterColor != null;
         break;
-      case FILA_MEDICO:
-        permitida = novoEstado == State.INDO_MEDICO;
+      case WAITING_FOR_MEDIC:
+        allowed = newState == State.GOING_TO_MEDIC;
         break;
-      case INDO_MEDICO:
-        permitida = novoEstado == State.EM_CONSULTA;
+      case GOING_TO_MEDIC:
+        allowed = newState == State.IN_CONSULTATION;
         break;
-      case EM_CONSULTA:
-        permitida = novoEstado == State.INDO_REMOVEDOR;
+      case IN_CONSULTATION:
+        allowed = newState == State.GOING_TO_REMOVER;
         break;
-      case INDO_REMOVEDOR:
-        permitida = novoEstado == State.REMOVIDO;
+      case GOING_TO_REMOVER:
+        allowed = newState == State.REMOVED;
         break;
-      case REMOVIDO:
+      case REMOVED:
         break;
     }
 
-    if (!permitida)
+    if (!allowed)
     {
       throw new IllegalStateException(
-          "Transicao de estado invalida: " + state + " -> " + novoEstado);
+          "Invalid state transition: " + state + " -> " + newState);
     }
 
-    state = novoEstado;
+    state = newState;
   }
 
   public void giveTicketNum(int ticketNum)
@@ -148,13 +148,13 @@ public class Pacient
       throw new InvalidTicketNumberException(ticketNum);
     }
 
-    if (state != State.NO_TOTEM)
+    if (state != State.AT_TOTEM)
     {
-      throw new IllegalStateException("O paciente precisa estar no totem para receber a senha.");
+      throw new IllegalStateException("The patient must be at the totem to receive a ticket.");
     }
 
     this.ticketNum = ticketNum;
-    mudarEstado(State.FILA_TRIAGEM);
+    changeState(State.WAITING_FOR_TRIAGE);
   }
 
   public String ticketString() {

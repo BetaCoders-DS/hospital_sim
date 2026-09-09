@@ -46,28 +46,28 @@ public sealed interface StaticEntities {
    */
   public final class Totem implements StaticEntities
   {
-    private int ultimaSenhaNormal = 0;
-    private int ultimaSenhaPreferencial = 0;
+    private int lastNormalTicket = 0;
+    private int lastPreferentialTicket = 0;
 
-    public void emitirSenha(Pacient paciente)
+    public void issueTicket(Pacient patient)
     {
-      if (paciente == null)
+      if (patient == null)
       {
-        throw new IllegalArgumentException("O paciente nao pode ser nulo.");
+        throw new IllegalArgumentException("The patient cannot be null.");
       }
 
       // O contador so avanca se o paciente receber a senha com sucesso.
-      if (paciente.preferential())
+      if (patient.preferential())
       {
-        int numero = ultimaSenhaPreferencial + 1;
-        paciente.giveTicketNum(numero);
-        ultimaSenhaPreferencial = numero;
+        int number = lastPreferentialTicket + 1;
+        patient.giveTicketNum(number);
+        lastPreferentialTicket = number;
       }
       else
       {
-        int numero = ultimaSenhaNormal + 1;
-        paciente.giveTicketNum(numero);
-        ultimaSenhaNormal = numero;
+        int number = lastNormalTicket + 1;
+        patient.giveTicketNum(number);
+        lastNormalTicket = number;
       }
     }
   }
